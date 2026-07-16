@@ -575,10 +575,6 @@ function CustomizeStep(p: {
   setPosition: (v: Position) => void;
   attachOn: boolean;
   setAttachOn: (v: boolean) => void;
-  attachMode: "single" | "multi";
-  setAttachMode: (v: "single" | "multi") => void;
-  voiceOn: boolean;
-  setVoiceOn: (v: boolean) => void;
 }) {
   return (
     <>
