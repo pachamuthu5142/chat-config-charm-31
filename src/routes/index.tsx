@@ -1384,11 +1384,12 @@ function OverviewWidget({
   mutedText,
   border,
   position,
-  purpose,
   ticket,
   faq,
   contactCard,
   customLinks,
+  faqItems,
+  linkItems,
   previewTab,
   setPreviewTab,
   appearance,
@@ -1401,11 +1402,12 @@ function OverviewWidget({
   mutedText: string;
   border: string;
   position: React.CSSProperties;
-  purpose: Purpose;
   ticket: boolean;
   faq: boolean;
   contactCard: boolean;
   customLinks: boolean;
+  faqItems: FaqItem[];
+  linkItems: LinkItem[];
   previewTab: Tab;
   setPreviewTab: (t: Tab) => void;
   appearance: Appearance;
