@@ -1112,8 +1112,6 @@ function PreviewCanvas(p: {
           mutedText={mutedText}
           border={border}
         />
-      ) : p.template === "simple" && p.variant === "voice" ? (
-        <VoiceWidget theme={p.theme} position={posStyle} />
       ) : p.template === "simple" ? (
         <ClassicWidget
           theme={p.theme}
