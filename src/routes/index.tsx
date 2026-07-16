@@ -815,15 +815,36 @@ function ContentStep(p: {
   setFaq: (v: boolean) => void;
   customLinks: boolean;
   setCustomLinks: (v: boolean) => void;
-  purpose: Purpose;
-  setPurpose: (v: Purpose) => void;
-  carousel: boolean;
-  setCarousel: (v: boolean) => void;
-  recommendations: boolean;
-  setRecommendations: (v: boolean) => void;
   ticket: boolean;
   setTicket: (v: boolean) => void;
+  faqItems: FaqItem[];
+  setFaqItems: React.Dispatch<React.SetStateAction<FaqItem[]>>;
+  linkItems: LinkItem[];
+  setLinkItems: React.Dispatch<React.SetStateAction<LinkItem[]>>;
+  linkDraft: string;
+  setLinkDraft: (v: string) => void;
 }) {
+  const addFaq = () =>
+    p.setFaqItems((prev) => [...prev, { id: `f${Date.now()}`, question: "", answer: "" }]);
+  const updateFaq = (id: string, patch: Partial<FaqItem>) =>
+    p.setFaqItems((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  const removeFaq = (id: string) => p.setFaqItems((prev) => prev.filter((f) => f.id !== id));
+
+  const addLink = () => {
+    if (!p.linkDraft.trim()) return;
+    p.setLinkItems((prev) => [...prev, { id: `l${Date.now()}`, name: "", url: p.linkDraft.trim() }]);
+    p.setLinkDraft("");
+  };
+  const updateLink = (id: string, patch: Partial<LinkItem>) =>
+    p.setLinkItems((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  const removeLink = (id: string) => p.setLinkItems((prev) => prev.filter((l) => l.id !== id));
+
+  const ord = (i: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = (i + 1) % 100;
+    return `${i + 1}${s[(v - 20) % 10] || s[v] || s[0]}`;
+  };
+
   return (
     <>
       <div className="mb-8">
@@ -839,53 +860,106 @@ function ContentStep(p: {
           <ToggleRow label="Contact Card" on={p.contactCard} onChange={p.setContactCard} />
           <ToggleRow label="FAQ" on={p.faq} onChange={p.setFaq} />
           <ToggleRow label="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
+          <ToggleRow label="Ticket Feature" on={p.ticket} onChange={p.setTicket} />
         </div>
       </Group>
 
-      <Group>
-        <GroupLabel>Bot Purpose</GroupLabel>
-        <div className="grid grid-cols-2 gap-3">
-          {(
-            [
-              { k: "sales", label: "Sales / Enquiry Bot", desc: "Showcase products and capture leads" },
-              { k: "support", label: "Customer Support Bot", desc: "Resolve tickets and answer FAQs" },
-            ] as const
-          ).map((opt) => {
-            const sel = p.purpose === opt.k;
-            return (
-              <button
-                key={opt.k}
-                onClick={() => p.setPurpose(opt.k as Purpose)}
-                className="text-left rounded-xl border p-3.5 relative transition"
-                style={{ borderColor: sel ? "#f05742" : "#e5e7eb", background: sel ? "#fff5f2" : "white" }}
-              >
-                <div className="text-[13px] font-semibold text-neutral-900">{opt.label}</div>
-                <div className="text-[11px] text-neutral-500 mt-1">{opt.desc}</div>
-                {sel && (
-                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
-                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+      {p.faq && (
+        <Group>
+          <GroupLabel>FAQ</GroupLabel>
+          <div className="space-y-3">
+            {p.faqItems.map((f, i) => (
+              <div key={f.id} className="rounded-xl border border-neutral-200 bg-white p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[12px] font-bold text-neutral-800">{ord(i)} Question</div>
+                  <button
+                    onClick={() => removeFaq(f.id)}
+                    className="text-neutral-400 hover:text-red-500"
+                    aria-label="Delete"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <input
+                  value={f.question}
+                  onChange={(e) => updateFaq(f.id, { question: e.target.value })}
+                  placeholder="Type your question"
+                  className="w-full h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742] mb-2"
+                />
+                <div className="relative">
+                  <textarea
+                    value={f.answer}
+                    onChange={(e) => updateFaq(f.id, { answer: e.target.value })}
+                    placeholder="Type your answer"
+                    rows={3}
+                    className="w-full p-3 pr-9 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742] resize-none"
+                  />
+                  <Sparkles className="absolute top-2.5 right-2.5 h-4 w-4 text-[#f05742]" />
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={addFaq}
+              className="w-full h-10 rounded-lg border border-dashed border-neutral-300 text-[12px] font-semibold text-neutral-600 hover:border-[#f05742] hover:text-[#f05742]"
+            >
+              + Add question
+            </button>
+          </div>
+        </Group>
+      )}
 
-        {p.purpose === "sales" && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white px-4">
-            <ToggleRow label="Product Carousel" on={p.carousel} onChange={p.setCarousel} />
-            <ToggleRow label="Product Recommendations" on={p.recommendations} onChange={p.setRecommendations} />
+      {p.customLinks && (
+        <Group>
+          <GroupLabel>Custom links</GroupLabel>
+          <div className="flex gap-2 mb-3">
+            <input
+              value={p.linkDraft}
+              onChange={(e) => p.setLinkDraft(e.target.value)}
+              placeholder="https://example.com"
+              className="flex-1 h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]"
+            />
+            <button
+              onClick={addLink}
+              className="h-10 px-4 rounded-lg text-white text-[12px] font-semibold"
+              style={{ background: "#f05742" }}
+            >
+              Create link
+            </button>
           </div>
-        )}
-        {p.purpose === "support" && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white px-4">
-            <ToggleRow label="Ticket Feature" on={p.ticket} onChange={p.setTicket} />
+          <div className="space-y-2">
+            {p.linkItems.map((l) => (
+              <div key={l.id} className="rounded-xl border border-neutral-200 bg-white p-3 flex items-start gap-2">
+                <div className="text-neutral-300 pt-2 cursor-grab select-none">⋮⋮</div>
+                <div className="flex-1 space-y-2">
+                  <input
+                    value={l.name}
+                    onChange={(e) => updateLink(l.id, { name: e.target.value })}
+                    placeholder="Name your link"
+                    className="w-full h-9 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]"
+                  />
+                  <input
+                    value={l.url}
+                    onChange={(e) => updateLink(l.id, { url: e.target.value })}
+                    placeholder="URL"
+                    className="w-full h-9 px-3 rounded-lg border border-neutral-200 bg-white text-[12px] outline-none focus:border-[#f05742] text-neutral-500"
+                  />
+                </div>
+                <button
+                  onClick={() => removeLink(l.id)}
+                  className="text-neutral-400 hover:text-red-500 pt-2"
+                  aria-label="Delete"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
           </div>
-        )}
-      </Group>
+        </Group>
+      )}
     </>
   );
 }
+
 
 // ---------- STEP 4 ----------
 function EmbedStep(p: {
