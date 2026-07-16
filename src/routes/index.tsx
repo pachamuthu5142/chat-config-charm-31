@@ -190,10 +190,6 @@ function ConfigPage() {
               setPosition={setPosition}
               attachOn={attachOn}
               setAttachOn={setAttachOn}
-              attachMode={attachMode}
-              setAttachMode={setAttachMode}
-              voiceOn={voiceOn}
-              setVoiceOn={setVoiceOn}
             />
           )}
           {step === "content" && template === "overview" && (
@@ -204,14 +200,14 @@ function ConfigPage() {
               setFaq={setFaq}
               customLinks={customLinks}
               setCustomLinks={setCustomLinks}
-              purpose={purpose}
-              setPurpose={setPurpose}
-              carousel={carousel}
-              setCarousel={setCarousel}
-              recommendations={recommendations}
-              setRecommendations={setRecommendations}
               ticket={ticket}
               setTicket={setTicket}
+              faqItems={faqItems}
+              setFaqItems={setFaqItems}
+              linkItems={linkItems}
+              setLinkItems={setLinkItems}
+              linkDraft={linkDraft}
+              setLinkDraft={setLinkDraft}
             />
           )}
           {step === "embed" && (
