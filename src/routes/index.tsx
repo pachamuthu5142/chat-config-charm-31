@@ -67,15 +67,17 @@ function ConfigPage() {
   const [background, setBackground] = useState<Background>("gradient");
   const [position, setPosition] = useState<Position>("right");
   const [attachOn, setAttachOn] = useState(false);
-  const [attachMode, setAttachMode] = useState<"single" | "multi">("single");
-  const [voiceOn, setVoiceOn] = useState(false);
   const [contactCard, setContactCard] = useState(true);
   const [faq, setFaq] = useState(true);
   const [customLinks, setCustomLinks] = useState(false);
-  const [purpose, setPurpose] = useState<Purpose>("support");
-  const [carousel, setCarousel] = useState(true);
-  const [recommendations, setRecommendations] = useState(false);
   const [ticket, setTicket] = useState(true);
+  const [faqItems, setFaqItems] = useState<FaqItem[]>([
+    { id: "f1", question: "What is the delivery time?", answer: "Shipping takes 5 days on average. We will send you a confirmation message with your package's tracking information and delivery date." },
+    { id: "f2", question: "Do you ship internationally?", answer: "Yes, we deliver to any location worldwide." },
+    { id: "f3", question: "What is the return policy?", answer: "You have 7 days to return the product." },
+  ]);
+  const [linkItems, setLinkItems] = useState<LinkItem[]>([]);
+  const [linkDraft, setLinkDraft] = useState("");
   const [previewTab, setPreviewTab] = useState<Tab>("home");
   const [copied, setCopied] = useState(false);
   const [platform, setPlatform] = useState("Script Tag");
