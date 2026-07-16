@@ -258,12 +258,12 @@ function ConfigPage() {
             theme={theme}
             background={background}
             position={position}
-            purpose={purpose}
             ticket={ticket}
             faq={faq}
             contactCard={contactCard}
             customLinks={customLinks}
-            voiceOn={voiceOn}
+            faqItems={faqItems}
+            linkItems={linkItems}
             previewTab={previewTab}
             setPreviewTab={setPreviewTab}
           />
