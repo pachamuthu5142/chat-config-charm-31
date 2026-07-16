@@ -26,12 +26,13 @@ export const Route = createFileRoute("/")({
 
 // ---------- types ----------
 type Template = "simple" | "overview";
-type Variant = "classic" | "voice" | "bold" | "docked";
+type Variant = "classic" | "bold" | "docked";
 type Appearance = "light" | "dark";
-type Background = "solid" | "gradient" | "image";
+type Background = "solid" | "gradient";
 type Position = "left" | "right";
-type Purpose = "sales" | "support" | null;
 type Tab = "home" | "messages";
+type FaqItem = { id: string; question: string; answer: string };
+type LinkItem = { id: string; name: string; url: string };
 
 const COLORS = [
   "#111827",
@@ -66,15 +67,17 @@ function ConfigPage() {
   const [background, setBackground] = useState<Background>("gradient");
   const [position, setPosition] = useState<Position>("right");
   const [attachOn, setAttachOn] = useState(false);
-  const [attachMode, setAttachMode] = useState<"single" | "multi">("single");
-  const [voiceOn, setVoiceOn] = useState(false);
   const [contactCard, setContactCard] = useState(true);
   const [faq, setFaq] = useState(true);
   const [customLinks, setCustomLinks] = useState(false);
-  const [purpose, setPurpose] = useState<Purpose>("support");
-  const [carousel, setCarousel] = useState(true);
-  const [recommendations, setRecommendations] = useState(false);
   const [ticket, setTicket] = useState(true);
+  const [faqItems, setFaqItems] = useState<FaqItem[]>([
+    { id: "f1", question: "What is the delivery time?", answer: "Shipping takes 5 days on average. We will send you a confirmation message with your package's tracking information and delivery date." },
+    { id: "f2", question: "Do you ship internationally?", answer: "Yes, we deliver to any location worldwide." },
+    { id: "f3", question: "What is the return policy?", answer: "You have 7 days to return the product." },
+  ]);
+  const [linkItems, setLinkItems] = useState<LinkItem[]>([]);
+  const [linkDraft, setLinkDraft] = useState("");
   const [previewTab, setPreviewTab] = useState<Tab>("home");
   const [copied, setCopied] = useState(false);
   const [platform, setPlatform] = useState("Script Tag");
@@ -187,10 +190,6 @@ function ConfigPage() {
               setPosition={setPosition}
               attachOn={attachOn}
               setAttachOn={setAttachOn}
-              attachMode={attachMode}
-              setAttachMode={setAttachMode}
-              voiceOn={voiceOn}
-              setVoiceOn={setVoiceOn}
             />
           )}
           {step === "content" && template === "overview" && (
@@ -201,14 +200,14 @@ function ConfigPage() {
               setFaq={setFaq}
               customLinks={customLinks}
               setCustomLinks={setCustomLinks}
-              purpose={purpose}
-              setPurpose={setPurpose}
-              carousel={carousel}
-              setCarousel={setCarousel}
-              recommendations={recommendations}
-              setRecommendations={setRecommendations}
               ticket={ticket}
               setTicket={setTicket}
+              faqItems={faqItems}
+              setFaqItems={setFaqItems}
+              linkItems={linkItems}
+              setLinkItems={setLinkItems}
+              linkDraft={linkDraft}
+              setLinkDraft={setLinkDraft}
             />
           )}
           {step === "embed" && (
@@ -259,12 +258,12 @@ function ConfigPage() {
             theme={theme}
             background={background}
             position={position}
-            purpose={purpose}
             ticket={ticket}
             faq={faq}
             contactCard={contactCard}
             customLinks={customLinks}
-            voiceOn={voiceOn}
+            faqItems={faqItems}
+            linkItems={linkItems}
             previewTab={previewTab}
             setPreviewTab={setPreviewTab}
           />
@@ -393,44 +392,41 @@ function TemplatesStep({
         </div>
       </Group>
 
-      {template === "simple" && (
-        <Group>
-          <GroupLabel hint="Layout style for the Simple template">Choose Layout Variant</GroupLabel>
-          <div className="grid grid-cols-2 gap-3">
-            {(
-              [
-                { k: "classic", label: "Classic", mini: <ClassicMini /> },
-                { k: "voice", label: "Voice Agent", mini: <VoiceMini /> },
-                { k: "bold", label: "Bold", mini: <BoldMini /> },
-                { k: "docked", label: "Docked", mini: <DockedMini /> },
-              ] as const
-            ).map((v) => {
-              const sel = variant === v.k;
-              return (
-                <button
-                  key={v.k}
-                  onClick={() => setVariant(v.k)}
-                  className="text-left rounded-xl p-3 border transition relative"
-                  style={{
-                    borderColor: sel ? "#f05742" : "#e5e7eb",
-                    background: sel ? "#fff5f2" : "white",
-                  }}
-                >
-                  <div className="rounded-lg overflow-hidden h-24 bg-neutral-100 mb-2 flex items-center justify-center">
-                    {v.mini}
+      <Group>
+        <GroupLabel hint="Layout style for your widget">Choose Layout Variant</GroupLabel>
+        <div className="grid grid-cols-3 gap-3">
+          {(
+            [
+              { k: "classic", label: "Classic", mini: <ClassicMini /> },
+              { k: "bold", label: "Bold", mini: <BoldMini /> },
+              { k: "docked", label: "Docked", mini: <DockedMini /> },
+            ] as const
+          ).map((v) => {
+            const sel = variant === v.k;
+            return (
+              <button
+                key={v.k}
+                onClick={() => setVariant(v.k)}
+                className="text-left rounded-xl p-3 border transition relative"
+                style={{
+                  borderColor: sel ? "#f05742" : "#e5e7eb",
+                  background: sel ? "#fff5f2" : "white",
+                }}
+              >
+                <div className="rounded-lg overflow-hidden h-24 bg-neutral-100 mb-2 flex items-center justify-center">
+                  {v.mini}
+                </div>
+                <div className="text-[13px] font-semibold text-neutral-900">{v.label}</div>
+                {sel && (
+                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
                   </div>
-                  <div className="text-[13px] font-semibold text-neutral-900">{v.label}</div>
-                  {sel && (
-                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
-                      <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </Group>
-      )}
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </Group>
     </>
   );
 }
@@ -579,10 +575,6 @@ function CustomizeStep(p: {
   setPosition: (v: Position) => void;
   attachOn: boolean;
   setAttachOn: (v: boolean) => void;
-  attachMode: "single" | "multi";
-  setAttachMode: (v: "single" | "multi") => void;
-  voiceOn: boolean;
-  setVoiceOn: (v: boolean) => void;
 }) {
   return (
     <>
@@ -705,53 +697,33 @@ function CustomizeStep(p: {
         )}
       </Group>
 
-      <Group>
-        <GroupLabel>Choose background</GroupLabel>
-        <div className="space-y-2.5">
-          <BgCard
-            selected={p.background === "solid"}
-            onClick={() => p.setBackground("solid")}
-            title="Solid"
-            desc="Theme color used as a background"
-            preview={<div className="h-9 w-14 rounded-md" style={{ background: p.theme }} />}
-          />
-          <BgCard
-            selected={p.background === "gradient"}
-            onClick={() => p.setBackground("gradient")}
-            title="Gradient"
-            desc="Colors automatically generated based on the theme color"
-            preview={
-              <div
-                className="h-9 w-14 rounded-md"
-                style={{ background: `radial-gradient(circle at 30% 30%, ${p.theme}, #1e2028)` }}
-              />
-            }
-          />
-          <BgCard
-            selected={p.background === "image"}
-            onClick={() => p.setBackground("image")}
-            title="Image"
-            desc="720×600, add your own file or pick from gallery"
-            preview={
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {COLORS.slice(0, 5).map((c) => (
-                    <span key={c} className="h-3 w-3 rounded-full border border-white" style={{ background: c }} />
-                  ))}
-                </div>
+
+      {p.template === "overview" && (
+        <Group>
+          <GroupLabel>Choose background</GroupLabel>
+          <div className="space-y-2.5">
+            <BgCard
+              selected={p.background === "solid"}
+              onClick={() => p.setBackground("solid")}
+              title="Solid"
+              desc="Theme color used as a background"
+              preview={<div className="h-9 w-14 rounded-md" style={{ background: p.theme }} />}
+            />
+            <BgCard
+              selected={p.background === "gradient"}
+              onClick={() => p.setBackground("gradient")}
+              title="Gradient"
+              desc="Colors automatically generated based on the theme color"
+              preview={
                 <div
                   className="h-9 w-14 rounded-md"
-                  style={{
-                    background:
-                      "repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 4px, #f3f4f6 4px, #f3f4f6 8px)",
-                  }}
+                  style={{ background: `radial-gradient(circle at 30% 30%, ${p.theme}, #1e2028)` }}
                 />
-                <button className="text-[11px] text-[#f05742] font-semibold">Remove</button>
-              </div>
-            }
-          />
-        </div>
-      </Group>
+              }
+            />
+          </div>
+        </Group>
+      )}
 
       <Group>
         <GroupLabel>Widget Position</GroupLabel>
@@ -776,21 +748,6 @@ function CustomizeStep(p: {
       <Group>
         <GroupLabel>Features</GroupLabel>
         <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} />
-        {p.attachOn && (
-          <div className="pl-1 py-1">
-            <Checkbox
-              label="Single attachment"
-              checked={p.attachMode === "single"}
-              onChange={() => p.setAttachMode("single")}
-            />
-            <Checkbox
-              label="Multi attachment"
-              checked={p.attachMode === "multi"}
-              onChange={() => p.setAttachMode("multi")}
-            />
-          </div>
-        )}
-        <ToggleRow label="Voice" on={p.voiceOn} onChange={p.setVoiceOn} />
       </Group>
     </>
   );
@@ -858,15 +815,36 @@ function ContentStep(p: {
   setFaq: (v: boolean) => void;
   customLinks: boolean;
   setCustomLinks: (v: boolean) => void;
-  purpose: Purpose;
-  setPurpose: (v: Purpose) => void;
-  carousel: boolean;
-  setCarousel: (v: boolean) => void;
-  recommendations: boolean;
-  setRecommendations: (v: boolean) => void;
   ticket: boolean;
   setTicket: (v: boolean) => void;
+  faqItems: FaqItem[];
+  setFaqItems: React.Dispatch<React.SetStateAction<FaqItem[]>>;
+  linkItems: LinkItem[];
+  setLinkItems: React.Dispatch<React.SetStateAction<LinkItem[]>>;
+  linkDraft: string;
+  setLinkDraft: (v: string) => void;
 }) {
+  const addFaq = () =>
+    p.setFaqItems((prev) => [...prev, { id: `f${Date.now()}`, question: "", answer: "" }]);
+  const updateFaq = (id: string, patch: Partial<FaqItem>) =>
+    p.setFaqItems((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  const removeFaq = (id: string) => p.setFaqItems((prev) => prev.filter((f) => f.id !== id));
+
+  const addLink = () => {
+    if (!p.linkDraft.trim()) return;
+    p.setLinkItems((prev) => [...prev, { id: `l${Date.now()}`, name: "", url: p.linkDraft.trim() }]);
+    p.setLinkDraft("");
+  };
+  const updateLink = (id: string, patch: Partial<LinkItem>) =>
+    p.setLinkItems((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  const removeLink = (id: string) => p.setLinkItems((prev) => prev.filter((l) => l.id !== id));
+
+  const ord = (i: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = (i + 1) % 100;
+    return `${i + 1}${s[(v - 20) % 10] || s[v] || s[0]}`;
+  };
+
   return (
     <>
       <div className="mb-8">
@@ -882,53 +860,106 @@ function ContentStep(p: {
           <ToggleRow label="Contact Card" on={p.contactCard} onChange={p.setContactCard} />
           <ToggleRow label="FAQ" on={p.faq} onChange={p.setFaq} />
           <ToggleRow label="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
+          <ToggleRow label="Ticket Feature" on={p.ticket} onChange={p.setTicket} />
         </div>
       </Group>
 
-      <Group>
-        <GroupLabel>Bot Purpose</GroupLabel>
-        <div className="grid grid-cols-2 gap-3">
-          {(
-            [
-              { k: "sales", label: "Sales / Enquiry Bot", desc: "Showcase products and capture leads" },
-              { k: "support", label: "Customer Support Bot", desc: "Resolve tickets and answer FAQs" },
-            ] as const
-          ).map((opt) => {
-            const sel = p.purpose === opt.k;
-            return (
-              <button
-                key={opt.k}
-                onClick={() => p.setPurpose(opt.k as Purpose)}
-                className="text-left rounded-xl border p-3.5 relative transition"
-                style={{ borderColor: sel ? "#f05742" : "#e5e7eb", background: sel ? "#fff5f2" : "white" }}
-              >
-                <div className="text-[13px] font-semibold text-neutral-900">{opt.label}</div>
-                <div className="text-[11px] text-neutral-500 mt-1">{opt.desc}</div>
-                {sel && (
-                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
-                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
+      {p.faq && (
+        <Group>
+          <GroupLabel>FAQ</GroupLabel>
+          <div className="space-y-3">
+            {p.faqItems.map((f, i) => (
+              <div key={f.id} className="rounded-xl border border-neutral-200 bg-white p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-[12px] font-bold text-neutral-800">{ord(i)} Question</div>
+                  <button
+                    onClick={() => removeFaq(f.id)}
+                    className="text-neutral-400 hover:text-red-500"
+                    aria-label="Delete"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <input
+                  value={f.question}
+                  onChange={(e) => updateFaq(f.id, { question: e.target.value })}
+                  placeholder="Type your question"
+                  className="w-full h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742] mb-2"
+                />
+                <div className="relative">
+                  <textarea
+                    value={f.answer}
+                    onChange={(e) => updateFaq(f.id, { answer: e.target.value })}
+                    placeholder="Type your answer"
+                    rows={3}
+                    className="w-full p-3 pr-9 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742] resize-none"
+                  />
+                  <Sparkles className="absolute top-2.5 right-2.5 h-4 w-4 text-[#f05742]" />
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={addFaq}
+              className="w-full h-10 rounded-lg border border-dashed border-neutral-300 text-[12px] font-semibold text-neutral-600 hover:border-[#f05742] hover:text-[#f05742]"
+            >
+              + Add question
+            </button>
+          </div>
+        </Group>
+      )}
 
-        {p.purpose === "sales" && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white px-4">
-            <ToggleRow label="Product Carousel" on={p.carousel} onChange={p.setCarousel} />
-            <ToggleRow label="Product Recommendations" on={p.recommendations} onChange={p.setRecommendations} />
+      {p.customLinks && (
+        <Group>
+          <GroupLabel>Custom links</GroupLabel>
+          <div className="flex gap-2 mb-3">
+            <input
+              value={p.linkDraft}
+              onChange={(e) => p.setLinkDraft(e.target.value)}
+              placeholder="https://example.com"
+              className="flex-1 h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]"
+            />
+            <button
+              onClick={addLink}
+              className="h-10 px-4 rounded-lg text-white text-[12px] font-semibold"
+              style={{ background: "#f05742" }}
+            >
+              Create link
+            </button>
           </div>
-        )}
-        {p.purpose === "support" && (
-          <div className="mt-4 rounded-xl border border-neutral-200 bg-white px-4">
-            <ToggleRow label="Ticket Feature" on={p.ticket} onChange={p.setTicket} />
+          <div className="space-y-2">
+            {p.linkItems.map((l) => (
+              <div key={l.id} className="rounded-xl border border-neutral-200 bg-white p-3 flex items-start gap-2">
+                <div className="text-neutral-300 pt-2 cursor-grab select-none">⋮⋮</div>
+                <div className="flex-1 space-y-2">
+                  <input
+                    value={l.name}
+                    onChange={(e) => updateLink(l.id, { name: e.target.value })}
+                    placeholder="Name your link"
+                    className="w-full h-9 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]"
+                  />
+                  <input
+                    value={l.url}
+                    onChange={(e) => updateLink(l.id, { url: e.target.value })}
+                    placeholder="URL"
+                    className="w-full h-9 px-3 rounded-lg border border-neutral-200 bg-white text-[12px] outline-none focus:border-[#f05742] text-neutral-500"
+                  />
+                </div>
+                <button
+                  onClick={() => removeLink(l.id)}
+                  className="text-neutral-400 hover:text-red-500 pt-2"
+                  aria-label="Delete"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
           </div>
-        )}
-      </Group>
+        </Group>
+      )}
     </>
   );
 }
+
 
 // ---------- STEP 4 ----------
 function EmbedStep(p: {
@@ -1032,12 +1063,12 @@ function PreviewCanvas(p: {
   theme: string;
   background: Background;
   position: Position;
-  purpose: Purpose;
   ticket: boolean;
   faq: boolean;
   contactCard: boolean;
   customLinks: boolean;
-  voiceOn: boolean;
+  faqItems: FaqItem[];
+  linkItems: LinkItem[];
   previewTab: Tab;
   setPreviewTab: (t: Tab) => void;
 }) {
@@ -1081,8 +1112,6 @@ function PreviewCanvas(p: {
           mutedText={mutedText}
           border={border}
         />
-      ) : p.template === "simple" && p.variant === "voice" ? (
-        <VoiceWidget theme={p.theme} position={posStyle} />
       ) : p.template === "simple" ? (
         <ClassicWidget
           theme={p.theme}
@@ -1102,7 +1131,8 @@ function PreviewCanvas(p: {
           mutedText={mutedText}
           border={border}
           position={posStyle}
-          purpose={p.purpose}
+          faqItems={p.faqItems}
+          linkItems={p.linkItems}
           ticket={p.ticket}
           faq={p.faq}
           contactCard={p.contactCard}
@@ -1354,11 +1384,12 @@ function OverviewWidget({
   mutedText,
   border,
   position,
-  purpose,
   ticket,
   faq,
   contactCard,
   customLinks,
+  faqItems,
+  linkItems,
   previewTab,
   setPreviewTab,
   appearance,
@@ -1371,11 +1402,12 @@ function OverviewWidget({
   mutedText: string;
   border: string;
   position: React.CSSProperties;
-  purpose: Purpose;
   ticket: boolean;
   faq: boolean;
   contactCard: boolean;
   customLinks: boolean;
+  faqItems: FaqItem[];
+  linkItems: LinkItem[];
   previewTab: Tab;
   setPreviewTab: (t: Tab) => void;
   appearance: Appearance;
@@ -1423,8 +1455,8 @@ function OverviewWidget({
           </div>
 
           {/* content list */}
-          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-2.5">
-            {purpose === "support" && ticket && (
+          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-3">
+            {ticket && (
               <div
                 className="rounded-2xl p-4 flex items-center gap-3"
                 style={{
@@ -1450,10 +1482,45 @@ function OverviewWidget({
               </div>
             )}
 
-            {faq && <ListRow label="FAQ" desc="Frequently asked questions" color={surfaceText} muted={mutedText} border={border} />}
-            {customLinks && <ListRow label="Custom Links" desc="Documentation & guides" color={surfaceText} muted={mutedText} border={border} />}
+            {faq && faqItems.length > 0 && (
+              <div>
+                <div className="text-[12px] font-bold mb-2" style={{ color: surfaceText }}>Quick answers</div>
+                <div className="rounded-xl overflow-hidden border" style={{ borderColor: border }}>
+                  {faqItems.map((f, i) => (
+                    <FaqAccordion
+                      key={f.id}
+                      question={f.question || `Question ${i + 1}`}
+                      answer={f.answer}
+                      surfaceText={surfaceText}
+                      mutedText={mutedText}
+                      border={border}
+                      theme={theme}
+                      last={i === faqItems.length - 1}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {customLinks && linkItems.length > 0 && (
+              <div className="space-y-2">
+                {linkItems.map((l) => (
+                  <a
+                    key={l.id}
+                    href={l.url || "#"}
+                    className="flex items-center justify-between px-4 h-11 rounded-xl border text-[13px] font-semibold"
+                    style={{ borderColor: border, color: surfaceText, background: appearance === "dark" ? "rgba(255,255,255,0.03)" : "white" }}
+                  >
+                    <span>{l.name || l.url || "Untitled link"}</span>
+                    <ChevronRight className="h-4 w-4" style={{ color: mutedText }} />
+                  </a>
+                ))}
+              </div>
+            )}
+
             {contactCard && <ListRow label="Contact us" desc="Talk to a real human" color={surfaceText} muted={mutedText} border={border} />}
           </div>
+
 
           <BottomTabs tab={previewTab} setTab={setPreviewTab} theme={theme} mutedText={mutedText} border={border} surface={surface} />
         </>
@@ -1572,6 +1639,45 @@ function MsgBubble({
   return (
     <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[12.5px] ${right ? "ml-auto" : ""}`} style={{ background: color, color: fg }}>
       {text}
+    </div>
+  );
+}
+
+function FaqAccordion({
+  question,
+  answer,
+  surfaceText,
+  mutedText,
+  border,
+  theme,
+  last,
+}: {
+  question: string;
+  answer: string;
+  surfaceText: string;
+  mutedText: string;
+  border: string;
+  theme: string;
+  last: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: last ? "none" : `1px solid ${border}` }}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left"
+      >
+        <span className="text-[13px] font-semibold pr-3" style={{ color: surfaceText }}>{question}</span>
+        <ChevronRight
+          className="h-4 w-4 shrink-0 transition-transform"
+          style={{ color: theme, transform: open ? "rotate(90deg)" : "none" }}
+        />
+      </button>
+      {open && answer && (
+        <div className="px-4 pb-3 text-[12px] leading-relaxed" style={{ color: mutedText }}>
+          {answer}
+        </div>
+      )}
     </div>
   );
 }
