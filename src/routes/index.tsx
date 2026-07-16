@@ -392,44 +392,41 @@ function TemplatesStep({
         </div>
       </Group>
 
-      {template === "simple" && (
-        <Group>
-          <GroupLabel hint="Layout style for the Simple template">Choose Layout Variant</GroupLabel>
-          <div className="grid grid-cols-2 gap-3">
-            {(
-              [
-                { k: "classic", label: "Classic", mini: <ClassicMini /> },
-                { k: "voice", label: "Voice Agent", mini: <VoiceMini /> },
-                { k: "bold", label: "Bold", mini: <BoldMini /> },
-                { k: "docked", label: "Docked", mini: <DockedMini /> },
-              ] as const
-            ).map((v) => {
-              const sel = variant === v.k;
-              return (
-                <button
-                  key={v.k}
-                  onClick={() => setVariant(v.k)}
-                  className="text-left rounded-xl p-3 border transition relative"
-                  style={{
-                    borderColor: sel ? "#f05742" : "#e5e7eb",
-                    background: sel ? "#fff5f2" : "white",
-                  }}
-                >
-                  <div className="rounded-lg overflow-hidden h-24 bg-neutral-100 mb-2 flex items-center justify-center">
-                    {v.mini}
+      <Group>
+        <GroupLabel hint="Layout style for your widget">Choose Layout Variant</GroupLabel>
+        <div className="grid grid-cols-3 gap-3">
+          {(
+            [
+              { k: "classic", label: "Classic", mini: <ClassicMini /> },
+              { k: "bold", label: "Bold", mini: <BoldMini /> },
+              { k: "docked", label: "Docked", mini: <DockedMini /> },
+            ] as const
+          ).map((v) => {
+            const sel = variant === v.k;
+            return (
+              <button
+                key={v.k}
+                onClick={() => setVariant(v.k)}
+                className="text-left rounded-xl p-3 border transition relative"
+                style={{
+                  borderColor: sel ? "#f05742" : "#e5e7eb",
+                  background: sel ? "#fff5f2" : "white",
+                }}
+              >
+                <div className="rounded-lg overflow-hidden h-24 bg-neutral-100 mb-2 flex items-center justify-center">
+                  {v.mini}
+                </div>
+                <div className="text-[13px] font-semibold text-neutral-900">{v.label}</div>
+                {sel && (
+                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
                   </div>
-                  <div className="text-[13px] font-semibold text-neutral-900">{v.label}</div>
-                  {sel && (
-                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
-                      <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </Group>
-      )}
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </Group>
     </>
   );
 }
