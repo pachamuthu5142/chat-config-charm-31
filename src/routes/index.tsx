@@ -1063,12 +1063,12 @@ function PreviewCanvas(p: {
   theme: string;
   background: Background;
   position: Position;
-  purpose: Purpose;
   ticket: boolean;
   faq: boolean;
   contactCard: boolean;
   customLinks: boolean;
-  voiceOn: boolean;
+  faqItems: FaqItem[];
+  linkItems: LinkItem[];
   previewTab: Tab;
   setPreviewTab: (t: Tab) => void;
 }) {
