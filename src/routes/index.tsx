@@ -1642,3 +1642,42 @@ function MsgBubble({
     </div>
   );
 }
+
+function FaqAccordion({
+  question,
+  answer,
+  surfaceText,
+  mutedText,
+  border,
+  theme,
+  last,
+}: {
+  question: string;
+  answer: string;
+  surfaceText: string;
+  mutedText: string;
+  border: string;
+  theme: string;
+  last: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: last ? "none" : `1px solid ${border}` }}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left"
+      >
+        <span className="text-[13px] font-semibold pr-3" style={{ color: surfaceText }}>{question}</span>
+        <ChevronRight
+          className="h-4 w-4 shrink-0 transition-transform"
+          style={{ color: theme, transform: open ? "rotate(90deg)" : "none" }}
+        />
+      </button>
+      {open && answer && (
+        <div className="px-4 pb-3 text-[12px] leading-relaxed" style={{ color: mutedText }}>
+          {answer}
+        </div>
+      )}
+    </div>
+  );
+}
