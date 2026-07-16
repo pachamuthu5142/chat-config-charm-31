@@ -1131,7 +1131,8 @@ function PreviewCanvas(p: {
           mutedText={mutedText}
           border={border}
           position={posStyle}
-          purpose={p.purpose}
+          faqItems={p.faqItems}
+          linkItems={p.linkItems}
           ticket={p.ticket}
           faq={p.faq}
           contactCard={p.contactCard}
