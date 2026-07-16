@@ -601,149 +601,30 @@ function CustomizeStep(p: {
 
       {p.template === "overview" && (
         <Group>
-          <GroupLabel>Greeting Message</GroupLabel>
-          <input
-            value={p.greeting}
-            onChange={(e) => p.setGreeting(e.target.value)}
-            className="w-full h-11 px-3.5 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742] transition"
-            placeholder="Say hello to your visitors…"
-          />
-        </Group>
-      )}
-
-      <Group>
-        <GroupLabel>Pick theme and color</GroupLabel>
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {(["light", "dark"] as Appearance[]).map((a) => {
-            const sel = p.appearance === a;
-            return (
-              <button
-                key={a}
-                onClick={() => p.setAppearance(a)}
-                className="relative rounded-xl border p-3 transition"
-                style={{ borderColor: sel ? "#f05742" : "#e5e7eb", background: sel ? "#fff5f2" : "white" }}
-              >
-                <div
-                  className="h-20 rounded-md overflow-hidden mb-2 flex flex-col"
-                  style={{ background: a === "light" ? "#fafafa" : "#1e2028" }}
-                >
-                  <div className="h-4" style={{ background: p.theme }} />
-                  <div className="p-1.5 space-y-1">
-                    <div className="h-1.5 w-10 rounded" style={{ background: a === "light" ? "#e5e7eb" : "#3f3f46" }} />
-                    <div className="h-1.5 w-14 rounded" style={{ background: a === "light" ? "#e5e7eb" : "#3f3f46" }} />
-                  </div>
-                </div>
-                <div className="text-[12px] font-semibold capitalize text-neutral-800">{a}</div>
-                {sel && (
-                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: "#f05742" }}>
-                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="space-y-2">
-          {[COLORS.slice(0, 5), COLORS.slice(5)].map((row, ri) => (
-            <div key={ri} className="flex gap-2.5">
-              {row.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => p.setTheme(c)}
-                  className="h-7 w-7 rounded-full border-2 transition"
-                  style={{
-                    background: c,
-                    borderColor: p.theme === c ? "#111" : "transparent",
-                    boxShadow: p.theme === c ? "0 0 0 2px white inset" : undefined,
-                  }}
-                  aria-label={c}
-                />
-              ))}
-              {ri === 1 && (
-                <button
-                  onClick={() => {
-                    const custom = prompt("Custom color (hex)", p.theme);
-                    if (custom) p.setTheme(custom);
-                  }}
-                  className="h-7 w-7 rounded-full border-2 border-transparent"
-                  style={{
-                    background:
-                      "conic-gradient(from 0deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #6366f1, #a855f7, #ec4899, #ef4444)",
-                  }}
-                  aria-label="Custom"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </Group>
-
-      <Group>
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-[13px] font-bold text-neutral-900">More colors settings</div>
-          <button
-            onClick={() => p.setShowMoreColors(!p.showMoreColors)}
-            className="text-[11px] font-semibold px-3 h-7 rounded-full border border-neutral-300 text-neutral-700 hover:bg-neutral-50"
-          >
-            {p.showMoreColors ? "Hide" : "Show"}
-          </button>
-        </div>
-        {p.showMoreColors && (
-          <div className="grid grid-cols-2 gap-3">
-            <ColorField label="Bubble" value={p.bubbleColor} onChange={p.setBubbleColor} />
-            <ColorField label="Icon color" value={p.iconColor} onChange={p.setIconColor} />
-          </div>
-        )}
-      </Group>
-
-      <Group>
-        <GroupLabel>Choose background</GroupLabel>
-        <div className="space-y-2.5">
-          <BgCard
-            selected={p.background === "solid"}
-            onClick={() => p.setBackground("solid")}
-            title="Solid"
-            desc="Theme color used as a background"
-            preview={<div className="h-9 w-14 rounded-md" style={{ background: p.theme }} />}
-          />
-          <BgCard
-            selected={p.background === "gradient"}
-            onClick={() => p.setBackground("gradient")}
-            title="Gradient"
-            desc="Colors automatically generated based on the theme color"
-            preview={
-              <div
-                className="h-9 w-14 rounded-md"
-                style={{ background: `radial-gradient(circle at 30% 30%, ${p.theme}, #1e2028)` }}
-              />
-            }
-          />
-          <BgCard
-            selected={p.background === "image"}
-            onClick={() => p.setBackground("image")}
-            title="Image"
-            desc="720×600, add your own file or pick from gallery"
-            preview={
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {COLORS.slice(0, 5).map((c) => (
-                    <span key={c} className="h-3 w-3 rounded-full border border-white" style={{ background: c }} />
-                  ))}
-                </div>
+          <GroupLabel>Choose background</GroupLabel>
+          <div className="space-y-2.5">
+            <BgCard
+              selected={p.background === "solid"}
+              onClick={() => p.setBackground("solid")}
+              title="Solid"
+              desc="Theme color used as a background"
+              preview={<div className="h-9 w-14 rounded-md" style={{ background: p.theme }} />}
+            />
+            <BgCard
+              selected={p.background === "gradient"}
+              onClick={() => p.setBackground("gradient")}
+              title="Gradient"
+              desc="Colors automatically generated based on the theme color"
+              preview={
                 <div
                   className="h-9 w-14 rounded-md"
-                  style={{
-                    background:
-                      "repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 4px, #f3f4f6 4px, #f3f4f6 8px)",
-                  }}
+                  style={{ background: `radial-gradient(circle at 30% 30%, ${p.theme}, #1e2028)` }}
                 />
-                <button className="text-[11px] text-[#f05742] font-semibold">Remove</button>
-              </div>
-            }
-          />
-        </div>
-      </Group>
+              }
+            />
+          </div>
+        </Group>
+      )}
 
       <Group>
         <GroupLabel>Widget Position</GroupLabel>
@@ -768,21 +649,6 @@ function CustomizeStep(p: {
       <Group>
         <GroupLabel>Features</GroupLabel>
         <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} />
-        {p.attachOn && (
-          <div className="pl-1 py-1">
-            <Checkbox
-              label="Single attachment"
-              checked={p.attachMode === "single"}
-              onChange={() => p.setAttachMode("single")}
-            />
-            <Checkbox
-              label="Multi attachment"
-              checked={p.attachMode === "multi"}
-              onChange={() => p.setAttachMode("multi")}
-            />
-          </div>
-        )}
-        <ToggleRow label="Voice" on={p.voiceOn} onChange={p.setVoiceOn} />
       </Group>
     </>
   );
