@@ -1455,8 +1455,8 @@ function OverviewWidget({
           </div>
 
           {/* content list */}
-          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-2.5">
-            {purpose === "support" && ticket && (
+          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-3">
+            {ticket && (
               <div
                 className="rounded-2xl p-4 flex items-center gap-3"
                 style={{
@@ -1482,10 +1482,45 @@ function OverviewWidget({
               </div>
             )}
 
-            {faq && <ListRow label="FAQ" desc="Frequently asked questions" color={surfaceText} muted={mutedText} border={border} />}
-            {customLinks && <ListRow label="Custom Links" desc="Documentation & guides" color={surfaceText} muted={mutedText} border={border} />}
+            {faq && faqItems.length > 0 && (
+              <div>
+                <div className="text-[12px] font-bold mb-2" style={{ color: surfaceText }}>Quick answers</div>
+                <div className="rounded-xl overflow-hidden border" style={{ borderColor: border }}>
+                  {faqItems.map((f, i) => (
+                    <FaqAccordion
+                      key={f.id}
+                      question={f.question || `Question ${i + 1}`}
+                      answer={f.answer}
+                      surfaceText={surfaceText}
+                      mutedText={mutedText}
+                      border={border}
+                      theme={theme}
+                      last={i === faqItems.length - 1}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {customLinks && linkItems.length > 0 && (
+              <div className="space-y-2">
+                {linkItems.map((l) => (
+                  <a
+                    key={l.id}
+                    href={l.url || "#"}
+                    className="flex items-center justify-between px-4 h-11 rounded-xl border text-[13px] font-semibold"
+                    style={{ borderColor: border, color: surfaceText, background: appearance === "dark" ? "rgba(255,255,255,0.03)" : "white" }}
+                  >
+                    <span>{l.name || l.url || "Untitled link"}</span>
+                    <ChevronRight className="h-4 w-4" style={{ color: mutedText }} />
+                  </a>
+                ))}
+              </div>
+            )}
+
             {contactCard && <ListRow label="Contact us" desc="Talk to a real human" color={surfaceText} muted={mutedText} border={border} />}
           </div>
+
 
           <BottomTabs tab={previewTab} setTab={setPreviewTab} theme={theme} mutedText={mutedText} border={border} surface={surface} />
         </>
