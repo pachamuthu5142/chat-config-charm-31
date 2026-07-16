@@ -26,12 +26,13 @@ export const Route = createFileRoute("/")({
 
 // ---------- types ----------
 type Template = "simple" | "overview";
-type Variant = "classic" | "voice" | "bold" | "docked";
+type Variant = "classic" | "bold" | "docked";
 type Appearance = "light" | "dark";
-type Background = "solid" | "gradient" | "image";
+type Background = "solid" | "gradient";
 type Position = "left" | "right";
-type Purpose = "sales" | "support" | null;
 type Tab = "home" | "messages";
+type FaqItem = { id: string; question: string; answer: string };
+type LinkItem = { id: string; name: string; url: string };
 
 const COLORS = [
   "#111827",
