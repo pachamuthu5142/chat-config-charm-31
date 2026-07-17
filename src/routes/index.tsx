@@ -100,7 +100,8 @@ const STEPS_BASE = [
   { n: 4, label: "Add to Website", key: "embed" as const },
 ];
 
-const ENTITY_ICONS: Record<EntityIcon, React.ComponentType<{ className?: string }>> = {
+type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+const ENTITY_ICONS: Record<EntityIcon, IconComp> = {
   ticket: Ticket,
   star: Star,
   package: Package,
