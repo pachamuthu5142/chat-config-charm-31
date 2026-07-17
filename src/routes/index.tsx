@@ -896,7 +896,7 @@ function EntityEditor({ entity, onChange, onRemove }: {
     }
   };
 
-  const iconEntries: [EntityIcon, React.ComponentType<{ className?: string }>][] = [
+  const iconEntries: [EntityIcon, IconComp][] = [
     ["ticket", Ticket], ["star", Star], ["package", Package], ["shopping", ShoppingBag], ["bell", Bell], ["zap", Zap],
   ];
 
