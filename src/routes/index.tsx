@@ -273,6 +273,13 @@ function ConfigPage() {
           })}
         </nav>
         <div className="p-4 border-t border-white/5 space-y-3">
+          <a
+            href="/builder"
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-white/90 hover:bg-white/[0.06] transition border border-white/10"
+          >
+            <Sparkles className="h-3.5 w-3.5" style={{ color: "#f05742" }} />
+            Try the conversational builder
+          </a>
           <div className="flex items-center gap-2 text-[11px] text-neutral-400">
             <span className="h-2 w-2 rounded-full bg-amber-400 inline-block" />
             Draft — Unpublished
