@@ -750,15 +750,13 @@ function ContentStep(p: {
       </div>
 
       <Group>
-        <GroupLabel>Provide Help</GroupLabel>
-        <div className="rounded-xl border border-neutral-200 bg-white px-4">
-          <ToggleRow label="Contact Card" on={p.contactOn} onChange={p.setContactOn} />
-          <ToggleRow label="FAQ" on={p.faq} onChange={p.setFaq} />
-          <ToggleRow label="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
-          <ToggleRow label="Custom Entity Cards" on={p.entitiesOn} onChange={p.setEntitiesOn} desc="Render dynamic data from your APIs" />
-        </div>
+        <div className="text-[13px] font-bold text-neutral-900">Provide Help</div>
+        <p className="text-[12px] text-neutral-500 mt-1">Turn on the blocks you want on the home tab.</p>
       </Group>
 
+      <Group>
+        <SectionHeader title="Contact Card" on={p.contactOn} onChange={p.setContactOn} />
+      </Group>
       {p.contactOn && (
         <Group>
           <GroupLabel>Contact Card</GroupLabel>
