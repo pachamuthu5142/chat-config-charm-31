@@ -787,9 +787,9 @@ function ContentStep(p: {
       </Group>
 
 
-      {p.faq && (
-        <Group>
-          <GroupLabel>FAQ</GroupLabel>
+      <Group>
+        <SectionHeader title="FAQ" on={p.faq} onChange={p.setFaq} />
+        {p.faq && (
           <div className="space-y-3">
             {p.faqItems.map((f, i) => (
               <div key={f.id} className="rounded-xl border border-neutral-200 bg-white p-3">
