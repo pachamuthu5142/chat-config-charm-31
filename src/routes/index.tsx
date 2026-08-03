@@ -680,10 +680,6 @@ function CustomizeStep(p: {
           ))}
         </div>
       </Group>
-      <Group>
-        <GroupLabel>Features</GroupLabel>
-        <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} />
-      </Group>
     </>
   );
 }
