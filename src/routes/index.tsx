@@ -97,7 +97,8 @@ const STEPS_BASE = [
   { n: 1, label: "Templates", key: "templates" as const },
   { n: 2, label: "Customize Look", key: "customize" as const },
   { n: 3, label: "Widget Content", key: "content" as const, overviewOnly: true },
-  { n: 4, label: "Add to Website", key: "embed" as const },
+  { n: 4, label: "Features", key: "features" as const },
+  { n: 5, label: "Add to Website", key: "embed" as const },
 ];
 
 type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -177,18 +178,16 @@ const SAMPLE_TICKETS = [
 
 // ---------- page ----------
 function ConfigPage() {
-  const [step, setStep] = useState<"templates" | "customize" | "content" | "embed">("templates");
+  const [step, setStep] = useState<"templates" | "customize" | "content" | "features" | "embed">("templates");
   const [template, setTemplate] = useState<Template>("overview");
   const [variant, setVariant] = useState<Variant>("classic");
   const [greeting, setGreeting] = useState("Hi there 👋 How can we help you today?");
   const [appearance, setAppearance] = useState<Appearance>("light");
   const [theme, setTheme] = useState<string>("#f05742");
-  const [showMoreColors, setShowMoreColors] = useState(false);
-  const [bubbleColor, setBubbleColor] = useState("#f05742");
-  const [iconColor, setIconColor] = useState("#ffffff");
   const [background, setBackground] = useState<Background>("gradient");
   const [position, setPosition] = useState<Position>("right");
   const [attachOn, setAttachOn] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(false);
   const [contactOn, setContactOn] = useState(true);
   const [faq, setFaq] = useState(true);
   const [customLinks, setCustomLinks] = useState(false);
@@ -251,7 +250,7 @@ function ConfigPage() {
           </div>
         </div>
         <nav className="px-3 flex-1 space-y-1">
-          {steps.map((s) => {
+          {steps.map((s, si) => {
             const active = step === s.key;
             return (
               <button
@@ -265,7 +264,7 @@ function ConfigPage() {
                   className={`h-6 w-6 rounded-md flex items-center justify-center text-[11px] font-semibold ${active ? "text-white" : "text-neutral-300 bg-white/[0.06]"}`}
                   style={active ? { background: "#f05742" } : undefined}
                 >
-                  {s.n}
+                  {si + 1}
                 </span>
                 <span className="text-[13px] font-medium">{s.label}</span>
               </button>
@@ -273,13 +272,6 @@ function ConfigPage() {
           })}
         </nav>
         <div className="p-4 border-t border-white/5 space-y-3">
-          <a
-            href="/builder"
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12px] font-semibold text-white/90 hover:bg-white/[0.06] transition border border-white/10"
-          >
-            <Sparkles className="h-3.5 w-3.5" style={{ color: "#f05742" }} />
-            Try the conversational builder
-          </a>
           <div className="flex items-center gap-2 text-[11px] text-neutral-400">
             <span className="h-2 w-2 rounded-full bg-amber-400 inline-block" />
             Draft — Unpublished
@@ -302,13 +294,12 @@ function ConfigPage() {
               greeting={greeting} setGreeting={setGreeting}
               appearance={appearance} setAppearance={setAppearance}
               theme={theme} setTheme={setTheme}
-              showMoreColors={showMoreColors} setShowMoreColors={setShowMoreColors}
-              bubbleColor={bubbleColor} setBubbleColor={setBubbleColor}
-              iconColor={iconColor} setIconColor={setIconColor}
               background={background} setBackground={setBackground}
               position={position} setPosition={setPosition}
-              attachOn={attachOn} setAttachOn={setAttachOn}
             />
+          )}
+          {step === "features" && (
+            <FeaturesStep attachOn={attachOn} setAttachOn={setAttachOn} voiceOn={voiceOn} setVoiceOn={setVoiceOn} />
           )}
           {step === "content" && template === "overview" && (
             <ContentStep
@@ -403,6 +394,17 @@ function Switch({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
     >
       <span className="inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow transition" style={{ transform: on ? "translateX(18px)" : "translateX(2px)" }} />
     </button>
+  );
+}
+function SectionHeader({ title, on, onChange, desc }: { title: string; on: boolean; onChange: (v: boolean) => void; desc?: string }) {
+  return (
+    <div className="flex items-start justify-between mb-3">
+      <div>
+        <div className="text-[13px] font-bold text-neutral-900">{title}</div>
+        {desc && <div className="text-[12px] text-neutral-500 mt-0.5">{desc}</div>}
+      </div>
+      <Switch on={on} onChange={onChange} />
+    </div>
   );
 }
 function ToggleRow({ label, on, onChange, desc }: { label: string; on: boolean; onChange: (v: boolean) => void; desc?: string }) {
@@ -556,12 +558,8 @@ function CustomizeStep(p: {
   greeting: string; setGreeting: (v: string) => void;
   appearance: Appearance; setAppearance: (v: Appearance) => void;
   theme: string; setTheme: (v: string) => void;
-  showMoreColors: boolean; setShowMoreColors: (v: boolean) => void;
-  bubbleColor: string; setBubbleColor: (v: string) => void;
-  iconColor: string; setIconColor: (v: string) => void;
   background: Background; setBackground: (v: Background) => void;
   position: Position; setPosition: (v: Position) => void;
-  attachOn: boolean; setAttachOn: (v: boolean) => void;
 }) {
   return (
     <>
@@ -636,20 +634,6 @@ function CustomizeStep(p: {
           ))}
         </div>
       </Group>
-      <Group>
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-[13px] font-bold text-neutral-900">More colors settings</div>
-          <button onClick={() => p.setShowMoreColors(!p.showMoreColors)} className="text-[11px] font-semibold px-3 h-7 rounded-full border border-neutral-300 text-neutral-700 hover:bg-neutral-50">
-            {p.showMoreColors ? "Hide" : "Show"}
-          </button>
-        </div>
-        {p.showMoreColors && (
-          <div className="grid grid-cols-2 gap-3">
-            <ColorField label="Bubble" value={p.bubbleColor} onChange={p.setBubbleColor} />
-            <ColorField label="Icon color" value={p.iconColor} onChange={p.setIconColor} />
-          </div>
-        )}
-      </Group>
       {p.template === "overview" && (
         <Group>
           <GroupLabel>Choose background</GroupLabel>
@@ -669,22 +653,26 @@ function CustomizeStep(p: {
           ))}
         </div>
       </Group>
-      <Group>
-        <GroupLabel>Features</GroupLabel>
-        <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} />
-      </Group>
     </>
   );
 }
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FeaturesStep(p: {
+  attachOn: boolean; setAttachOn: (v: boolean) => void;
+  voiceOn: boolean; setVoiceOn: (v: boolean) => void;
+}) {
   return (
-    <div>
-      <div className="text-[11px] font-semibold text-neutral-600 mb-1.5">{label}</div>
-      <div className="flex items-center gap-2 h-10 rounded-lg border border-neutral-200 bg-white px-2">
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="h-6 w-6 rounded overflow-hidden cursor-pointer border-0" />
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="flex-1 text-[12px] outline-none bg-transparent" />
+    <>
+      <div className="mb-8">
+        <h2 className="text-[18px] font-bold text-neutral-900">Features</h2>
+        <p className="text-[12px] text-neutral-500 mt-1">Choose what visitors can do inside the chat.</p>
       </div>
-    </div>
+      <Group>
+        <div className="rounded-xl border border-neutral-200 bg-white px-4">
+          <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} desc="Let visitors upload files in chat" />
+          <ToggleRow label="Voice message" on={p.voiceOn} onChange={p.setVoiceOn} desc="Record and send voice notes" />
+        </div>
+      </Group>
+    </>
   );
 }
 function BgCard({ selected, onClick, title, desc, preview }: { selected: boolean; onClick: () => void; title: string; desc: string; preview: React.ReactNode }) {
@@ -750,18 +738,13 @@ function ContentStep(p: {
       </div>
 
       <Group>
-        <GroupLabel>Provide Help</GroupLabel>
-        <div className="rounded-xl border border-neutral-200 bg-white px-4">
-          <ToggleRow label="Contact Card" on={p.contactOn} onChange={p.setContactOn} />
-          <ToggleRow label="FAQ" on={p.faq} onChange={p.setFaq} />
-          <ToggleRow label="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
-          <ToggleRow label="Custom Entity Cards" on={p.entitiesOn} onChange={p.setEntitiesOn} desc="Render dynamic data from your APIs" />
-        </div>
+        <div className="text-[13px] font-bold text-neutral-900">Provide Help</div>
+        <p className="text-[12px] text-neutral-500 mt-1">Turn on the blocks you want on the home tab.</p>
       </Group>
 
-      {p.contactOn && (
-        <Group>
-          <GroupLabel>Contact Card</GroupLabel>
+      <Group>
+        <SectionHeader title="Contact Card" on={p.contactOn} onChange={p.setContactOn} />
+        {p.contactOn && (
           <div className="space-y-3">
             {p.contacts.map((c, i) => (
               <div key={c.id} className="rounded-xl border border-neutral-200 bg-white p-3">
@@ -788,12 +771,13 @@ function ContentStep(p: {
               + Add contact
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
 
-      {p.faq && (
-        <Group>
-          <GroupLabel>FAQ</GroupLabel>
+
+      <Group>
+        <SectionHeader title="FAQ" on={p.faq} onChange={p.setFaq} />
+        {p.faq && (
           <div className="space-y-3">
             {p.faqItems.map((f, i) => (
               <div key={f.id} className="rounded-xl border border-neutral-200 bg-white p-3">
@@ -812,12 +796,14 @@ function ContentStep(p: {
               + Add question
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
 
-      {p.customLinks && (
-        <Group>
-          <GroupLabel>Custom links</GroupLabel>
+      <Group>
+        <SectionHeader title="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
+        {p.customLinks && (
+        <div>
+
           <div className="flex gap-2 mb-3">
             <input value={p.linkDraft} onChange={(e) => p.setLinkDraft(e.target.value)} placeholder="https://example.com" className="flex-1 h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]" />
             <button onClick={addLink} className="h-10 px-4 rounded-lg text-white text-[12px] font-semibold" style={{ background: "#f05742" }}>Create link</button>
@@ -834,12 +820,13 @@ function ContentStep(p: {
               </div>
             ))}
           </div>
-        </Group>
-      )}
+        </div>
+        )}
+      </Group>
 
-      {p.entitiesOn && (
-        <Group>
-          <GroupLabel hint="Fetch dynamic data and render it as a card block">Custom Entity Cards</GroupLabel>
+      <Group>
+        <SectionHeader title="Custom Entity Cards" on={p.entitiesOn} onChange={p.setEntitiesOn} desc="Render dynamic data from your APIs" />
+        {p.entitiesOn && (
           <div className="space-y-3">
             {p.entities.map((e) => (
               <EntityEditor
@@ -853,8 +840,9 @@ function ContentStep(p: {
               + Add entity card
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
+
     </>
   );
 }
