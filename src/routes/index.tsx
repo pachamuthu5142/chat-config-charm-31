@@ -808,12 +808,14 @@ function ContentStep(p: {
               + Add question
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
 
-      {p.customLinks && (
-        <Group>
-          <GroupLabel>Custom links</GroupLabel>
+      <Group>
+        <SectionHeader title="Custom Links" on={p.customLinks} onChange={p.setCustomLinks} />
+        {p.customLinks && (
+        <div>
+
           <div className="flex gap-2 mb-3">
             <input value={p.linkDraft} onChange={(e) => p.setLinkDraft(e.target.value)} placeholder="https://example.com" className="flex-1 h-10 px-3 rounded-lg border border-neutral-200 bg-white text-[13px] outline-none focus:border-[#f05742]" />
             <button onClick={addLink} className="h-10 px-4 rounded-lg text-white text-[12px] font-semibold" style={{ background: "#f05742" }}>Create link</button>
