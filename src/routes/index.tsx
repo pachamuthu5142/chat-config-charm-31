@@ -832,12 +832,13 @@ function ContentStep(p: {
               </div>
             ))}
           </div>
-        </Group>
-      )}
+        </div>
+        )}
+      </Group>
 
-      {p.entitiesOn && (
-        <Group>
-          <GroupLabel hint="Fetch dynamic data and render it as a card block">Custom Entity Cards</GroupLabel>
+      <Group>
+        <SectionHeader title="Custom Entity Cards" on={p.entitiesOn} onChange={p.setEntitiesOn} desc="Render dynamic data from your APIs" />
+        {p.entitiesOn && (
           <div className="space-y-3">
             {p.entities.map((e) => (
               <EntityEditor
