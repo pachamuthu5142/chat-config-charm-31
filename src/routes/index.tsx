@@ -186,6 +186,9 @@ function ConfigPage() {
   const [theme, setTheme] = useState<string>("#f05742");
   const [background, setBackground] = useState<Background>("gradient");
   const [position, setPosition] = useState<Position>("right");
+  const [launcherStyle, setLauncherStyle] = useState<"bubble" | "pill">("pill");
+  const [launcherText, setLauncherText] = useState("Chat with us");
+  const [widgetOpen, setWidgetOpen] = useState(true);
   const [attachOn, setAttachOn] = useState(false);
   const [voiceOn, setVoiceOn] = useState(false);
   const [contactOn, setContactOn] = useState(true);
@@ -296,6 +299,8 @@ function ConfigPage() {
               theme={theme} setTheme={setTheme}
               background={background} setBackground={setBackground}
               position={position} setPosition={setPosition}
+              launcherStyle={launcherStyle} setLauncherStyle={setLauncherStyle}
+              launcherText={launcherText} setLauncherText={setLauncherText}
             />
           )}
           {step === "features" && (
@@ -355,6 +360,10 @@ function ConfigPage() {
             theme={theme}
             background={background}
             position={position}
+            launcherStyle={launcherStyle}
+            launcherText={launcherText}
+            widgetOpen={widgetOpen}
+            setWidgetOpen={setWidgetOpen}
             entitiesOn={entitiesOn}
             faq={faq}
             contactOn={contactOn}
@@ -560,6 +569,8 @@ function CustomizeStep(p: {
   theme: string; setTheme: (v: string) => void;
   background: Background; setBackground: (v: Background) => void;
   position: Position; setPosition: (v: Position) => void;
+  launcherStyle: "bubble" | "pill"; setLauncherStyle: (v: "bubble" | "pill") => void;
+  launcherText: string; setLauncherText: (v: string) => void;
 }) {
   return (
     <>
@@ -643,6 +654,54 @@ function CustomizeStep(p: {
           </div>
         </Group>
       )}
+      <Group>
+        <GroupLabel>Floating Button</GroupLabel>
+        <p className="text-[12px] text-neutral-500 -mt-1 mb-3">This is what people see before they open the widget.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            { key: "bubble" as const, label: "Icon + Bubble" },
+            { key: "pill" as const, label: "Pill Button" },
+          ]).map((o) => {
+            const sel = p.launcherStyle === o.key;
+            return (
+              <button key={o.key} onClick={() => p.setLauncherStyle(o.key)} className="relative text-left rounded-xl border-2 p-3 transition" style={{ borderColor: sel ? p.theme : "#e5e7eb", background: sel ? `${p.theme}0f` : "white" }}>
+                <div className="h-[70px] rounded-lg bg-neutral-100 flex items-center justify-center gap-2 mb-2.5 px-2">
+                  {o.key === "bubble" ? (
+                    <>
+                      <span className="px-2.5 py-1.5 rounded-lg bg-white shadow-sm text-[10px] font-semibold text-neutral-800 truncate max-w-[80px]">{p.launcherText || "Chat with us"}</span>
+                      <span className="h-8 w-8 rounded-full flex items-center justify-center shrink-0" style={{ background: p.theme }}>
+                        <MessageSquare className="h-4 w-4 text-white" />
+                      </span>
+                    </>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 h-9 rounded-full text-[11px] font-semibold text-white" style={{ background: p.theme }}>
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      <span className="truncate max-w-[90px]">{p.launcherText || "Chat with us"}</span>
+                    </span>
+                  )}
+                </div>
+                <div className="text-[12px] font-semibold text-neutral-800">{o.label}</div>
+                {sel && (
+                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full flex items-center justify-center" style={{ background: p.theme }}>
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-4">
+          <div className="text-[12px] font-semibold text-neutral-700 mb-1.5">Button text <span style={{ color: "#f05742" }}>*</span></div>
+          <input
+            value={p.launcherText}
+            maxLength={35}
+            onChange={(e) => p.setLauncherText(e.target.value)}
+            className="w-full h-11 rounded-lg border border-neutral-200 px-3 text-[13px] outline-none focus:border-neutral-400"
+            placeholder="Chat with us"
+          />
+          <div className="text-[11px] text-neutral-400 mt-1">{p.launcherText.length}/35</div>
+        </div>
+      </Group>
       <Group>
         <GroupLabel>Widget Position</GroupLabel>
         <div className="grid grid-cols-2 gap-2 rounded-lg bg-neutral-100 p-1">
@@ -1121,6 +1180,10 @@ function PreviewCanvas(p: {
   theme: string;
   background: Background;
   position: Position;
+  launcherStyle: "bubble" | "pill";
+  launcherText: string;
+  widgetOpen: boolean;
+  setWidgetOpen: (v: boolean) => void;
   entitiesOn: boolean;
   faq: boolean;
   contactOn: boolean;
@@ -1153,7 +1216,18 @@ function PreviewCanvas(p: {
         <div className="h-3 w-52 rounded bg-white/50 mt-2" />
       </div>
 
+      {/* floating launcher */}
+      <Launcher
+        style={p.launcherStyle}
+        text={p.launcherText}
+        theme={p.theme}
+        position={p.position}
+        open={p.widgetOpen}
+        onClick={() => p.setWidgetOpen(!p.widgetOpen)}
+      />
+
       {/* widget wrapper based on variant */}
+      {p.widgetOpen && (
       <WidgetShell variant={p.variant} position={p.position} theme={p.theme} surface={surface} border={border}>
         {p.template === "simple" ? (
           <SimpleWidgetInner variant={p.variant} theme={p.theme} surface={surface} surfaceText={surfaceText} mutedText={mutedText} border={border} />
@@ -1180,6 +1254,34 @@ function PreviewCanvas(p: {
           />
         )}
       </WidgetShell>
+      )}
+    </div>
+  );
+}
+
+function Launcher({ style, text, theme, position, open, onClick }: {
+  style: "bubble" | "pill"; text: string; theme: string; position: Position; open: boolean; onClick: () => void;
+}) {
+  const pos: React.CSSProperties = position === "right" ? { right: 28, bottom: 24 } : { left: 28, bottom: 24 };
+  return (
+    <div className="absolute z-20 flex items-center gap-2.5" style={{ ...pos, flexDirection: position === "right" ? "row" : "row-reverse" }}>
+      {open ? (
+        <button onClick={onClick} className="h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition" style={{ background: theme }} aria-label="Close widget">
+          <X className="h-5 w-5 text-white" />
+        </button>
+      ) : style === "pill" ? (
+        <button onClick={onClick} className="inline-flex items-center gap-2 px-4 h-12 rounded-full shadow-lg text-[13px] font-semibold text-white" style={{ background: theme }}>
+          <MessageSquare className="h-4 w-4" />
+          {text || "Chat with us"}
+        </button>
+      ) : (
+        <>
+          <span className="px-3 py-2 rounded-xl bg-white shadow-md text-[12px] font-semibold text-neutral-800">{text || "Chat with us"}</span>
+          <button onClick={onClick} className="h-12 w-12 rounded-full shadow-lg flex items-center justify-center" style={{ background: theme }}>
+            <MessageSquare className="h-5 w-5 text-white" />
+          </button>
+        </>
+      )}
     </div>
   );
 }
@@ -1188,9 +1290,9 @@ function WidgetShell({ variant, position, theme, surface, border, children }: {
   variant: Variant; position: Position; theme: string; surface: string; border: string; children: React.ReactNode;
 }) {
   if (variant === "classic") {
-    const posStyle: React.CSSProperties = position === "right" ? { right: 40, bottom: 40 } : { left: 40, bottom: 40 };
+    const posStyle: React.CSSProperties = position === "right" ? { right: 28, bottom: 88 } : { left: 28, bottom: 88 };
     return (
-      <div className="absolute w-[360px] h-[600px] rounded-[28px] shadow-2xl overflow-hidden flex flex-col" style={{ ...posStyle, background: surface, border: `1px solid ${border}` }}>
+      <div className="absolute w-[360px] h-[560px] rounded-[28px] shadow-2xl overflow-hidden flex flex-col" style={{ ...posStyle, background: surface, border: `1px solid ${border}` }}>
         {children}
       </div>
     );
