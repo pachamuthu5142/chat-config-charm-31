@@ -250,7 +250,7 @@ function ConfigPage() {
           </div>
         </div>
         <nav className="px-3 flex-1 space-y-1">
-          {steps.map((s) => {
+          {steps.map((s, si) => {
             const active = step === s.key;
             return (
               <button
@@ -264,7 +264,7 @@ function ConfigPage() {
                   className={`h-6 w-6 rounded-md flex items-center justify-center text-[11px] font-semibold ${active ? "text-white" : "text-neutral-300 bg-white/[0.06]"}`}
                   style={active ? { background: "#f05742" } : undefined}
                 >
-                  {s.n}
+                  {si + 1}
                 </span>
                 <span className="text-[13px] font-medium">{s.label}</span>
               </button>
