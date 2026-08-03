@@ -405,6 +405,17 @@ function Switch({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
     </button>
   );
 }
+function SectionHeader({ title, on, onChange, desc }: { title: string; on: boolean; onChange: (v: boolean) => void; desc?: string }) {
+  return (
+    <div className="flex items-start justify-between mb-3">
+      <div>
+        <div className="text-[13px] font-bold text-neutral-900">{title}</div>
+        {desc && <div className="text-[12px] text-neutral-500 mt-0.5">{desc}</div>}
+      </div>
+      <Switch on={on} onChange={onChange} />
+    </div>
+  );
+}
 function ToggleRow({ label, on, onChange, desc }: { label: string; on: boolean; onChange: (v: boolean) => void; desc?: string }) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-b-0">
