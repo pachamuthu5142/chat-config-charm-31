@@ -783,8 +783,9 @@ function ContentStep(p: {
               + Add contact
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
+
 
       {p.faq && (
         <Group>
