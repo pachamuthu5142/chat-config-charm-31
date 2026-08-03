@@ -687,15 +687,23 @@ function CustomizeStep(p: {
     </>
   );
 }
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FeaturesStep(p: {
+  attachOn: boolean; setAttachOn: (v: boolean) => void;
+  voiceOn: boolean; setVoiceOn: (v: boolean) => void;
+}) {
   return (
-    <div>
-      <div className="text-[11px] font-semibold text-neutral-600 mb-1.5">{label}</div>
-      <div className="flex items-center gap-2 h-10 rounded-lg border border-neutral-200 bg-white px-2">
-        <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="h-6 w-6 rounded overflow-hidden cursor-pointer border-0" />
-        <input value={value} onChange={(e) => onChange(e.target.value)} className="flex-1 text-[12px] outline-none bg-transparent" />
+    <>
+      <div className="mb-8">
+        <h2 className="text-[18px] font-bold text-neutral-900">Features</h2>
+        <p className="text-[12px] text-neutral-500 mt-1">Choose what visitors can do inside the chat.</p>
       </div>
-    </div>
+      <Group>
+        <div className="rounded-xl border border-neutral-200 bg-white px-4">
+          <ToggleRow label="Attachment" on={p.attachOn} onChange={p.setAttachOn} desc="Let visitors upload files in chat" />
+          <ToggleRow label="Voice message" on={p.voiceOn} onChange={p.setVoiceOn} desc="Record and send voice notes" />
+        </div>
+      </Group>
+    </>
   );
 }
 function BgCard({ selected, onClick, title, desc, preview }: { selected: boolean; onClick: () => void; title: string; desc: string; preview: React.ReactNode }) {
