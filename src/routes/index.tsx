@@ -756,10 +756,7 @@ function ContentStep(p: {
 
       <Group>
         <SectionHeader title="Contact Card" on={p.contactOn} onChange={p.setContactOn} />
-      </Group>
-      {p.contactOn && (
-        <Group>
-          <GroupLabel>Contact Card</GroupLabel>
+        {p.contactOn && (
           <div className="space-y-3">
             {p.contacts.map((c, i) => (
               <div key={c.id} className="rounded-xl border border-neutral-200 bg-white p-3">
