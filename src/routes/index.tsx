@@ -852,8 +852,9 @@ function ContentStep(p: {
               + Add entity card
             </button>
           </div>
-        </Group>
-      )}
+        )}
+      </Group>
+
     </>
   );
 }
