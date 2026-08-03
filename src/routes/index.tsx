@@ -97,7 +97,8 @@ const STEPS_BASE = [
   { n: 1, label: "Templates", key: "templates" as const },
   { n: 2, label: "Customize Look", key: "customize" as const },
   { n: 3, label: "Widget Content", key: "content" as const, overviewOnly: true },
-  { n: 4, label: "Add to Website", key: "embed" as const },
+  { n: 4, label: "Features", key: "features" as const },
+  { n: 5, label: "Add to Website", key: "embed" as const },
 ];
 
 type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -177,18 +178,16 @@ const SAMPLE_TICKETS = [
 
 // ---------- page ----------
 function ConfigPage() {
-  const [step, setStep] = useState<"templates" | "customize" | "content" | "embed">("templates");
+  const [step, setStep] = useState<"templates" | "customize" | "content" | "features" | "embed">("templates");
   const [template, setTemplate] = useState<Template>("overview");
   const [variant, setVariant] = useState<Variant>("classic");
   const [greeting, setGreeting] = useState("Hi there 👋 How can we help you today?");
   const [appearance, setAppearance] = useState<Appearance>("light");
   const [theme, setTheme] = useState<string>("#f05742");
-  const [showMoreColors, setShowMoreColors] = useState(false);
-  const [bubbleColor, setBubbleColor] = useState("#f05742");
-  const [iconColor, setIconColor] = useState("#ffffff");
   const [background, setBackground] = useState<Background>("gradient");
   const [position, setPosition] = useState<Position>("right");
   const [attachOn, setAttachOn] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(false);
   const [contactOn, setContactOn] = useState(true);
   const [faq, setFaq] = useState(true);
   const [customLinks, setCustomLinks] = useState(false);
@@ -559,12 +558,8 @@ function CustomizeStep(p: {
   greeting: string; setGreeting: (v: string) => void;
   appearance: Appearance; setAppearance: (v: Appearance) => void;
   theme: string; setTheme: (v: string) => void;
-  showMoreColors: boolean; setShowMoreColors: (v: boolean) => void;
-  bubbleColor: string; setBubbleColor: (v: string) => void;
-  iconColor: string; setIconColor: (v: string) => void;
   background: Background; setBackground: (v: Background) => void;
   position: Position; setPosition: (v: Position) => void;
-  attachOn: boolean; setAttachOn: (v: boolean) => void;
 }) {
   return (
     <>
