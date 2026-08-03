@@ -295,13 +295,12 @@ function ConfigPage() {
               greeting={greeting} setGreeting={setGreeting}
               appearance={appearance} setAppearance={setAppearance}
               theme={theme} setTheme={setTheme}
-              showMoreColors={showMoreColors} setShowMoreColors={setShowMoreColors}
-              bubbleColor={bubbleColor} setBubbleColor={setBubbleColor}
-              iconColor={iconColor} setIconColor={setIconColor}
               background={background} setBackground={setBackground}
               position={position} setPosition={setPosition}
-              attachOn={attachOn} setAttachOn={setAttachOn}
             />
+          )}
+          {step === "features" && (
+            <FeaturesStep attachOn={attachOn} setAttachOn={setAttachOn} voiceOn={voiceOn} setVoiceOn={setVoiceOn} />
           )}
           {step === "content" && template === "overview" && (
             <ContentStep
