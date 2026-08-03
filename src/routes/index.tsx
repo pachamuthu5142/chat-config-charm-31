@@ -647,20 +647,6 @@ function CustomizeStep(p: {
           ))}
         </div>
       </Group>
-      <Group>
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-[13px] font-bold text-neutral-900">More colors settings</div>
-          <button onClick={() => p.setShowMoreColors(!p.showMoreColors)} className="text-[11px] font-semibold px-3 h-7 rounded-full border border-neutral-300 text-neutral-700 hover:bg-neutral-50">
-            {p.showMoreColors ? "Hide" : "Show"}
-          </button>
-        </div>
-        {p.showMoreColors && (
-          <div className="grid grid-cols-2 gap-3">
-            <ColorField label="Bubble" value={p.bubbleColor} onChange={p.setBubbleColor} />
-            <ColorField label="Icon color" value={p.iconColor} onChange={p.setIconColor} />
-          </div>
-        )}
-      </Group>
       {p.template === "overview" && (
         <Group>
           <GroupLabel>Choose background</GroupLabel>
