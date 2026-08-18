@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      widget_configs: {
+        Row: {
+          appearance: string
+          attach_on: boolean
+          background: string
+          contact_on: boolean
+          contacts: Json
+          created_at: string
+          custom_links_on: boolean
+          entities: Json
+          entities_on: boolean
+          faq_items: Json
+          faq_on: boolean
+          greeting: string
+          id: string
+          launcher_style: string
+          launcher_text: string
+          link_items: Json
+          platform: string
+          position: string
+          site_urls: string
+          template: string
+          theme: string
+          updated_at: string
+          variant: string
+          voice_on: boolean
+        }
+        Insert: {
+          appearance?: string
+          attach_on?: boolean
+          background?: string
+          contact_on?: boolean
+          contacts?: Json
+          created_at?: string
+          custom_links_on?: boolean
+          entities?: Json
+          entities_on?: boolean
+          faq_items?: Json
+          faq_on?: boolean
+          greeting?: string
+          id?: string
+          launcher_style?: string
+          launcher_text?: string
+          link_items?: Json
+          platform?: string
+          position?: string
+          site_urls?: string
+          template?: string
+          theme?: string
+          updated_at?: string
+          variant?: string
+          voice_on?: boolean
+        }
+        Update: {
+          appearance?: string
+          attach_on?: boolean
+          background?: string
+          contact_on?: boolean
+          contacts?: Json
+          created_at?: string
+          custom_links_on?: boolean
+          entities?: Json
+          entities_on?: boolean
+          faq_items?: Json
+          faq_on?: boolean
+          greeting?: string
+          id?: string
+          launcher_style?: string
+          launcher_text?: string
+          link_items?: Json
+          platform?: string
+          position?: string
+          site_urls?: string
+          template?: string
+          theme?: string
+          updated_at?: string
+          variant?: string
+          voice_on?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
