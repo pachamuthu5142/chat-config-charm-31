@@ -339,11 +339,11 @@ function ConfigPage() {
         </nav>
         <div className="p-4 border-t border-white/5 space-y-3">
           <div className="flex items-center gap-2 text-[11px] text-neutral-400">
-            <span className="h-2 w-2 rounded-full bg-amber-400 inline-block" />
-            Draft — Unpublished
+            <span className={`h-2 w-2 rounded-full inline-block ${saveState === "saved" ? "bg-green-400" : saveState === "error" ? "bg-red-400" : "bg-amber-400"}`} />
+            {saveState === "saved" ? "Saved to database" : saveState === "error" ? "Save failed" : "Draft — Unpublished"}
           </div>
-          <button className="w-full h-10 rounded-lg text-white text-[13px] font-semibold shadow-sm transition hover:brightness-95" style={{ background: "#f05742" }}>
-            Publish Widget
+          <button onClick={() => void publish()} disabled={saveState === "saving"} className="w-full h-10 rounded-lg text-white text-[13px] font-semibold shadow-sm transition hover:brightness-95 disabled:opacity-60" style={{ background: "#f05742" }}>
+            {saveState === "saving" ? "Saving…" : "Publish Widget"}
           </button>
         </div>
       </aside>
