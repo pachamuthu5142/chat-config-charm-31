@@ -228,6 +228,68 @@ function ConfigPage() {
   const [copied, setCopied] = useState(false);
   const [platform, setPlatform] = useState("Script Tag");
   const [urls, setUrls] = useState("");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const loadedRef = useRef(false);
+
+  // Load the saved shared draft once on mount.
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+    void loadWidgetConfig().then((c) => {
+      if (!c) return;
+      setTemplate(c.template as Template);
+      setVariant(c.variant as Variant);
+      setAppearance(c.appearance as Appearance);
+      setTheme(c.theme);
+      setBackground(c.background as Background);
+      setPosition(c.position as Position);
+      if (c.greeting) setGreeting(c.greeting);
+      setLauncherStyle(c.launcher_style === "bubble" ? "bubble" : "pill");
+      setLauncherText(c.launcher_text);
+      setAttachOn(c.attach_on);
+      setVoiceOn(c.voice_on);
+      setContactOn(c.contact_on);
+      setFaq(c.faq_on);
+      setCustomLinks(c.custom_links_on);
+      setEntitiesOn(c.entities_on);
+      if (Array.isArray(c.contacts) && c.contacts.length) setContacts(c.contacts as ContactItem[]);
+      if (Array.isArray(c.faq_items) && c.faq_items.length) setFaqItems(c.faq_items as FaqItem[]);
+      setLinkItems((Array.isArray(c.link_items) ? c.link_items : []) as LinkItem[]);
+      if (Array.isArray(c.entities) && c.entities.length) setEntities(c.entities as EntityCardCfg[]);
+      setUrls(c.site_urls);
+      setPlatform(c.platform || "Script Tag");
+    });
+  }, []);
+
+  const publish = async () => {
+    setSaveState("saving");
+    const ok = await saveWidgetConfig({
+      template,
+      variant,
+      appearance,
+      theme,
+      background,
+      position,
+      greeting,
+      launcher_style: launcherStyle,
+      launcher_text: launcherText,
+      attach_on: attachOn,
+      voice_on: voiceOn,
+      contact_on: contactOn,
+      faq_on: faq,
+      custom_links_on: customLinks,
+      entities_on: entitiesOn,
+      contacts,
+      faq_items: faqItems,
+      link_items: linkItems,
+      entities,
+      site_urls: urls,
+      platform,
+    });
+    setSaveState(ok ? "saved" : "error");
+    setTimeout(() => setSaveState("idle"), 2500);
+  };
+
 
   const steps = useMemo(
     () => STEPS_BASE.filter((s) => !s.overviewOnly || template === "overview"),
