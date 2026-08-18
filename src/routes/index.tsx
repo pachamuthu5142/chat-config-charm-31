@@ -391,6 +391,8 @@ function ConfigPage() {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 1500);
               }}
+              onPublish={() => void publish()}
+              saving={saveState === "saving"}
               platform={platform} setPlatform={setPlatform}
               urls={urls} setUrls={setUrls}
               onBack={() => {
@@ -1182,6 +1184,8 @@ function EmbedStep(p: {
   platform: string; setPlatform: (v: string) => void;
   urls: string; setUrls: (v: string) => void;
   onBack: () => void;
+  onPublish: () => void;
+  saving: boolean;
 }) {
   const platforms = ["Script Tag", "Google Tag Manager", "WordPress", "Shopify", "Wix", "Squarespace"];
   const instr: Record<string, string> = {
@@ -1228,7 +1232,7 @@ function EmbedStep(p: {
       </Group>
       <div className="flex justify-between pt-2">
         <button onClick={p.onBack} className="h-10 px-4 rounded-lg border border-neutral-200 text-[13px] font-semibold text-neutral-700 hover:bg-neutral-50">Back</button>
-        <button className="h-10 px-5 rounded-lg text-white text-[13px] font-semibold bg-green-600 hover:bg-green-700">Publish Widget</button>
+        <button onClick={p.onPublish} disabled={p.saving} className="h-10 px-5 rounded-lg text-white text-[13px] font-semibold bg-green-600 hover:bg-green-700 disabled:opacity-60">{p.saving ? "Saving…" : "Publish Widget"}</button>
       </div>
     </>
   );
