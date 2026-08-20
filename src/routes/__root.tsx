@@ -9,7 +9,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { ThemeProvider, CssBaseline, Box, Button, Typography, Stack } from "@mui/material";
+
 import appCss from "../styles.css?url";
+import { theme } from "../theme";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
