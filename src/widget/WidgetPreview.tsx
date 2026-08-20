@@ -2,6 +2,7 @@
 // WidgetConfig and never mutates it. Used by the conversational builder.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Box } from "@mui/material";
 import {
   Bell,
   Bot,
@@ -55,22 +56,38 @@ const sectionMotion = {
 };
 
 // ---------- header avatar: uploaded logo or default bot icon ----------
-function AvatarLogo({ logoUrl, className }: { logoUrl: string; className?: string }) {
+function AvatarLogo({ logoUrl, size = 32 }: { logoUrl: string; size?: number }) {
   if (logoUrl) {
     return (
-      <img
+      <Box
+        component="img"
         src={logoUrl}
         alt="logo"
-        className={`rounded-full object-cover bg-white ${className ?? "h-8 w-8"}`}
+        sx={{
+          borderRadius: "9999px",
+          objectFit: "cover",
+          bgcolor: "white",
+          height: size,
+          width: size,
+        }}
       />
     );
   }
   return (
-    <div
-      className={`rounded-full bg-white/20 backdrop-blur flex items-center justify-center ${className ?? "h-8 w-8"}`}
+    <Box
+      sx={{
+        borderRadius: "9999px",
+        bgcolor: "rgba(255,255,255,0.2)",
+        backdropFilter: "blur(6px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: size,
+        width: size,
+      }}
     >
-      <Bot className="h-4 w-4 text-white" />
-    </div>
+      <Bot className="h-4 w-4 text-white" style={{ height: 16, width: 16, color: "#fff" }} />
+    </Box>
   );
 }
 
@@ -78,9 +95,17 @@ function AvatarLogo({ logoUrl, className }: { logoUrl: string; className?: strin
 function Launcher({ cfg }: { cfg: WidgetConfig }) {
   const side: React.CSSProperties = cfg.position === "right" ? { right: 40 } : { left: 40 };
   return (
-    <motion.div
+    <Box
+      component={motion.div}
       layout
-      className={`absolute bottom-7 flex items-center gap-2 ${cfg.position === "left" ? "flex-row-reverse" : ""}`}
+      sx={{
+        position: "absolute",
+        bottom: 28,
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        flexDirection: cfg.position === "left" ? "row-reverse" : "row",
+      }}
       style={side}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -88,40 +113,77 @@ function Launcher({ cfg }: { cfg: WidgetConfig }) {
     >
       {cfg.launcherStyle === "icon" ? (
         <>
-          <div
-            className="h-10 px-4 rounded-full bg-white shadow-lg border border-black/5 flex items-center text-[13px] font-semibold"
-            style={{ color: "#1e2028" }}
+          <Box
+            sx={{
+              height: 40,
+              px: 2,
+              borderRadius: "9999px",
+              bgcolor: "white",
+              boxShadow: 4,
+              border: "1px solid rgba(0,0,0,0.05)",
+              display: "flex",
+              alignItems: "center",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "#1e2028",
+            }}
           >
             {cfg.launcherText}
-          </div>
-          <button
-            className="h-12 w-12 rounded-full shadow-xl flex items-center justify-center text-white"
+          </Box>
+          <Box
+            component="button"
+            sx={{
+              height: 48,
+              width: 48,
+              borderRadius: "9999px",
+              boxShadow: 6,
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              cursor: "pointer",
+            }}
             style={{ background: cfg.theme, ...colorTransition }}
           >
-            <MessageSquare className="h-5 w-5" />
-          </button>
+            <MessageSquare style={{ height: 20, width: 20 }} />
+          </Box>
         </>
       ) : (
-        <button
-          className="h-12 px-5 rounded-full shadow-xl flex items-center gap-2 text-white text-[13.5px] font-semibold"
+        <Box
+          component="button"
+          sx={{
+            height: 48,
+            px: 2.5,
+            borderRadius: "9999px",
+            boxShadow: 6,
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            color: "white",
+            fontSize: 13.5,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
           style={{ background: cfg.theme, ...colorTransition }}
         >
-          <MessageSquare className="h-4 w-4" />
+          <MessageSquare style={{ height: 16, width: 16 }} />
           {cfg.launcherText}
-        </button>
+        </Box>
       )}
-    </motion.div>
+    </Box>
   );
 }
 
 // ---------- typing animation for the greeting ----------
 function Typewriter({
   text,
-  className,
+  sx,
   style,
 }: {
   text: string;
-  className?: string;
+  sx?: object;
   style?: React.CSSProperties;
 }) {
   const [shown, setShown] = useState(text);
@@ -139,10 +201,14 @@ function Typewriter({
     return () => clearInterval(timer);
   }, [text]);
   return (
-    <div className={className} style={style}>
+    <Box sx={sx} style={style}>
       {shown}
-      {shown.length < text.length && <span className="animate-pulse">▍</span>}
-    </div>
+      {shown.length < text.length && (
+        <Box component="span" sx={{ animation: "pulse 1.5s ease-in-out infinite" }}>
+          ▍
+        </Box>
+      )}
+    </Box>
   );
 }
 
@@ -178,50 +244,86 @@ export function WidgetPreview({
   }, [cfg.entities, entityDraft]);
 
   return (
-    <div className="absolute inset-0">
+    <Box sx={{ position: "absolute", inset: 0 }}>
       {/* faux website backdrop */}
-      <div className="absolute inset-0 p-6 opacity-70">
-        <div className="h-8 w-40 rounded-md bg-white/70 mb-4" />
-        <div className="grid grid-cols-3 gap-4">
-          <div className="h-24 rounded-lg bg-white/60" />
-          <div className="h-24 rounded-lg bg-white/60" />
-          <div className="h-24 rounded-lg bg-white/60" />
-        </div>
-        <div className="h-3 w-64 rounded bg-white/60 mt-6" />
-        <div className="h-3 w-80 rounded bg-white/50 mt-2" />
-        <div className="h-3 w-52 rounded bg-white/50 mt-2" />
-      </div>
+      <Box sx={{ position: "absolute", inset: 0, p: 3, opacity: 0.7 }}>
+        <Box sx={{ height: 32, width: 160, borderRadius: "6px", bgcolor: "rgba(255,255,255,0.7)", mb: 2 }} />
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
+          <Box sx={{ height: 96, borderRadius: "8px", bgcolor: "rgba(255,255,255,0.6)" }} />
+          <Box sx={{ height: 96, borderRadius: "8px", bgcolor: "rgba(255,255,255,0.6)" }} />
+          <Box sx={{ height: 96, borderRadius: "8px", bgcolor: "rgba(255,255,255,0.6)" }} />
+        </Box>
+        <Box sx={{ height: 12, width: 256, borderRadius: "4px", bgcolor: "rgba(255,255,255,0.6)", mt: 3 }} />
+        <Box sx={{ height: 12, width: 320, borderRadius: "4px", bgcolor: "rgba(255,255,255,0.5)", mt: 1 }} />
+        <Box sx={{ height: 12, width: 208, borderRadius: "4px", bgcolor: "rgba(255,255,255,0.5)", mt: 1 }} />
+      </Box>
 
       <AnimatePresence mode="popLayout">
-        <motion.div
+        <Box
+          component={motion.div}
           key={`${cfg.variant}-${cfg.position}-${cfg.mountMode}`}
           initial={{ opacity: 0, scale: 0.94, y: 24 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 pointer-events-none"
+          sx={{ position: "absolute", inset: 0, pointerEvents: "none" }}
         >
-          <div className="absolute inset-0 pointer-events-auto">
+          <Box sx={{ position: "absolute", inset: 0, pointerEvents: "auto" }}>
             {cfg.mountMode === "element" ? (
-              <div className="absolute inset-0 flex items-center justify-center p-8 pt-14">
-                <div
-                  className="relative w-[400px] max-w-full h-full max-h-[640px] rounded-2xl border-2 border-dashed p-2 flex flex-col"
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  p: 4,
+                  pt: 7,
+                }}
+              >
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: 400,
+                    maxWidth: "100%",
+                    height: "100%",
+                    maxHeight: 640,
+                    borderRadius: "16px",
+                    border: "2px dashed",
+                    p: 0.5,
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                   style={{ borderColor: `${cfg.theme}66` }}
                 >
-                  <div
-                    className="absolute -top-2.5 left-4 px-2 text-[10px] font-mono font-semibold rounded"
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: -10,
+                      left: 16,
+                      px: 1,
+                      fontSize: 10,
+                      fontFamily: "monospace",
+                      fontWeight: 600,
+                      borderRadius: "4px",
+                    }}
                     style={{ background: "#eceef1", color: cfg.theme }}
                   >
                     {cfg.mountSelector || "#chat-container"}
-                  </div>
-                  <div
-                    className="flex-1 rounded-xl overflow-hidden flex flex-col shadow-xl"
+                  </Box>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      boxShadow: 6,
+                    }}
                     style={{
                       background: surface,
                       border: `1px solid ${border}`,
-                      ...{
-                        transition: "background 500ms ease, border-color 500ms ease",
-                      },
+                      transition: "background 500ms ease, border-color 500ms ease",
                     }}
                   >
                     {cfg.template === "simple" ? (
@@ -245,9 +347,9 @@ export function WidgetPreview({
                         setTab={setTab}
                       />
                     )}
-                  </div>
-                </div>
-              </div>
+                  </Box>
+                </Box>
+              </Box>
             ) : (
               <WidgetShell
                 variant={cfg.variant}
@@ -280,12 +382,12 @@ export function WidgetPreview({
               </WidgetShell>
             )}
             {cfg.mountMode === "root" && cfg.variant === "classic" && <Launcher cfg={cfg} />}
-          </div>
-        </motion.div>
+          </Box>
+        </Box>
       </AnimatePresence>
 
       <AnimatePresence>{celebrate && <Celebration theme={cfg.theme} />}</AnimatePresence>
-    </div>
+    </Box>
   );
 }
 
@@ -302,22 +404,24 @@ function Celebration({ theme }: { theme: string }) {
     [theme],
   );
   return (
-    <motion.div
-      className="absolute inset-0 pointer-events-none overflow-hidden"
+    <Box
+      component={motion.div}
+      sx={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       {pieces.map((p, i) => (
-        <motion.div
+        <Box
+          component={motion.div}
           key={i}
-          className="absolute rounded-sm"
+          sx={{ position: "absolute", borderRadius: "2px" }}
           style={{ left: p.left, top: -12, width: p.size, height: p.size, background: p.color }}
           initial={{ y: -20, rotate: 0, opacity: 1 }}
           animate={{ y: "110vh", rotate: p.rotate + 540, opacity: [1, 1, 0.6] }}
           transition={{ duration: 2.6 + (i % 5) * 0.35, delay: p.delay, ease: "easeIn" }}
         />
       ))}
-    </motion.div>
+    </Box>
   );
 }
 
@@ -340,8 +444,18 @@ function WidgetShell({
     const posStyle: React.CSSProperties =
       position === "right" ? { right: 40, bottom: 96 } : { left: 40, bottom: 96 };
     return (
-      <div
-        className="absolute w-[360px] h-[600px] max-h-[calc(100%-120px)] rounded-[28px] shadow-2xl overflow-hidden flex flex-col"
+      <Box
+        sx={{
+          position: "absolute",
+          width: 360,
+          height: 600,
+          maxHeight: "calc(100% - 120px)",
+          borderRadius: "28px",
+          boxShadow: 10,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
         style={{
           ...posStyle,
           background: surface,
@@ -350,7 +464,7 @@ function WidgetShell({
         }}
       >
         {children}
-      </div>
+      </Box>
     );
   }
   const width = variant === "bold" ? "65%" : "42%";
@@ -375,8 +489,8 @@ function WidgetShell({
         ? { borderLeft: `1px solid ${border}` }
         : { borderRight: `1px solid ${border}` };
   return (
-    <div
-      className="absolute shadow-2xl flex flex-col overflow-hidden"
+    <Box
+      sx={{ position: "absolute", boxShadow: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}
       style={{
         ...anchor,
         width,
@@ -387,7 +501,7 @@ function WidgetShell({
       }}
     >
       {children}
-    </div>
+    </Box>
   );
 }
 
@@ -406,49 +520,59 @@ function SimpleWidgetInner({
 }) {
   return (
     <>
-      <div
-        className="h-14 flex items-center justify-between px-4 shrink-0"
+      <Box
+        sx={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, flexShrink: 0 }}
         style={{ background: cfg.theme, ...colorTransition }}
       >
-        <div className="flex items-center gap-2 text-white">
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "white" }}>
           <AvatarLogo logoUrl={cfg.logoUrl} />
-          <div className="text-[13px] font-semibold">{cfg.assistantName}</div>
-        </div>
-        <div className="flex items-center gap-2 text-white/80">
-          <MoreHorizontal className="h-4 w-4" />
-          <X className="h-4 w-4" />
-        </div>
-      </div>
-      <div
-        className="flex-1 p-4 space-y-2.5 overflow-y-auto"
+          <Box sx={{ fontSize: 13, fontWeight: 600 }}>{cfg.assistantName}</Box>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "rgba(255,255,255,0.8)" }}>
+          <MoreHorizontal style={{ height: 16, width: 16 }} />
+          <X style={{ height: 16, width: 16 }} />
+        </Box>
+      </Box>
+      <Box
+        sx={{ flex: 1, p: 2, display: "flex", flexDirection: "column", gap: 1.25, overflowY: "auto" }}
         style={{ background: surface, ...colorTransition }}
       >
         <MsgBubble text="Hey! 👋 How can I help you today?" color="#f3f4f6" fg="#111827" />
         <MsgBubble text="I'd like to know about your pricing." color={cfg.theme} fg="#fff" right />
         <MsgBubble text="Sure — our plans start at $29/mo." color="#f3f4f6" fg="#111827" />
-      </div>
-      <div
-        className="h-14 border-t flex items-center px-3 gap-2 shrink-0"
+      </Box>
+      <Box
+        sx={{ height: 56, borderTop: "1px solid", display: "flex", alignItems: "center", px: 1.5, gap: 1, flexShrink: 0 }}
         style={{ borderColor: border, background: surface, ...colorTransition }}
       >
-        <input
+        <Box
+          component="input"
           placeholder="Type your message…"
-          className="flex-1 h-9 rounded-full px-3 text-[12px] outline-none border"
+          sx={{
+            flex: 1,
+            height: 36,
+            borderRadius: "9999px",
+            px: 1.5,
+            fontSize: 12,
+            outline: "none",
+            border: "1px solid",
+          }}
           style={{ borderColor: border, background: "transparent", color: surfaceText }}
         />
-        <button
-          className="h-9 w-9 rounded-full flex items-center justify-center text-white"
+        <Box
+          component="button"
+          sx={{ height: 36, width: 36, borderRadius: "9999px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", border: "none", cursor: "pointer" }}
           style={{ background: cfg.theme, ...colorTransition }}
         >
-          <Send className="h-4 w-4" />
-        </button>
-      </div>
-      <div
-        className="text-center text-[10px] text-neutral-400 py-1.5"
+          <Send style={{ height: 16, width: 16 }} />
+        </Box>
+      </Box>
+      <Box
+        sx={{ textAlign: "center", fontSize: 10, color: "neutral.400", py: 0.75 }}
         style={{ background: surface, ...colorTransition }}
       >
         Powered by ChatWidget
-      </div>
+      </Box>
     </>
   );
 }
@@ -484,39 +608,57 @@ function OverviewWidgetInner({
     <>
       {tab === "home" ? (
         <>
-          <div
-            className="relative px-5 pt-6 pb-14 shrink-0"
+          <Box
+            sx={{ position: "relative", px: 2.5, pt: 3, pb: 7, flexShrink: 0 }}
             style={{ background: heroBg, ...colorTransition }}
           >
-            <div className="flex items-center justify-between">
-              <AvatarLogo logoUrl={cfg.logoUrl} className="h-9 w-9" />
-              <X className="h-4 w-4 text-white/80" />
-            </div>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <AvatarLogo logoUrl={cfg.logoUrl} size={36} />
+              <X style={{ height: 16, width: 16, color: "rgba(255,255,255,0.8)" }} />
+            </Box>
             <Typewriter
               text={cfg.greeting}
-              className="mt-6 text-white text-[22px] font-bold leading-tight pr-6 min-h-[28px]"
+              sx={{ mt: 3, color: "white", fontSize: 22, fontWeight: 700, lineHeight: 1.2, pr: 3, minHeight: 28 }}
             />
-            <div className="text-white/70 text-[12px] mt-2">
+            <Box sx={{ color: "rgba(255,255,255,0.7)", fontSize: 12, mt: 1 }}>
               We're here to help — search below or pick an option.
-            </div>
-          </div>
-          <div className="px-4 -mt-6 relative z-10 shrink-0">
-            <button
+            </Box>
+          </Box>
+          <Box sx={{ px: 2, mt: "-24px", position: "relative", zIndex: 10, flexShrink: 0 }}>
+            <Box
+              component="button"
               onClick={() => setTab("messages")}
-              className="w-full h-12 rounded-full bg-white shadow-lg flex items-center gap-2 px-4 text-[13px] font-medium text-neutral-700 border border-black/5"
+              sx={{
+                width: "100%",
+                height: 48,
+                borderRadius: "9999px",
+                bgcolor: "white",
+                boxShadow: 6,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 2,
+                fontSize: 13,
+                fontWeight: 500,
+                color: "neutral.700",
+                border: "1px solid rgba(0,0,0,0.05)",
+                cursor: "pointer",
+              }}
             >
-              <MessageSquare className="h-4 w-4" style={{ color: cfg.theme }} />
+              <MessageSquare style={{ height: 16, width: 16, color: cfg.theme }} />
               Chat with us
-              <span className="ml-auto text-[11px] text-neutral-400">Send a message</span>
-            </button>
-          </div>
+              <Box component="span" sx={{ ml: "auto", fontSize: 11, color: "neutral.400" }}>
+                Send a message
+              </Box>
+            </Box>
+          </Box>
 
-          <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
+          <Box sx={{ flex: 1, overflowY: "auto", px: 2, pt: 2, pb: 1 }}>
             <AnimatePresence initial={false}>
               {cfg.entitiesOn &&
                 entities.map((e) => (
-                  <motion.div key={e.id} {...sectionMotion} className="overflow-hidden">
-                    <div className="pb-4">
+                  <Box component={motion.div} key={e.id} {...sectionMotion} sx={{ overflow: "hidden" }}>
+                    <Box sx={{ pb: 2 }}>
                       <EntityCardPreview
                         entity={e}
                         theme={cfg.theme}
@@ -525,51 +667,51 @@ function OverviewWidgetInner({
                         border={border}
                         appearance={cfg.appearance}
                       />
-                    </div>
-                  </motion.div>
+                    </Box>
+                  </Box>
                 ))}
 
               {cfg.entitiesOn && entityTesting && (
-                <motion.div key="entity-skeleton" {...sectionMotion} className="overflow-hidden">
-                  <div className="pb-4 space-y-2">
-                    <div
-                      className="h-3 w-24 rounded animate-pulse"
+                <Box component={motion.div} key="entity-skeleton" {...sectionMotion} sx={{ overflow: "hidden" }}>
+                  <Box sx={{ pb: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+                    <Box
+                      sx={{ height: 12, width: 96, borderRadius: "4px", animation: "pulse 1.5s ease-in-out infinite" }}
                       style={{ background: border }}
                     />
                     {[0, 1, 2].map((i) => (
-                      <div
+                      <Box
                         key={i}
-                        className="rounded-xl border p-3 flex items-center gap-3"
+                        sx={{ borderRadius: "12px", border: "1px solid", p: 1.5, display: "flex", alignItems: "center", gap: 1.5 }}
                         style={{ borderColor: border }}
                       >
-                        <div
-                          className="h-8 w-8 rounded-lg animate-pulse"
+                        <Box
+                          sx={{ height: 32, width: 32, borderRadius: "8px", animation: "pulse 1.5s ease-in-out infinite" }}
                           style={{ background: border }}
                         />
-                        <div className="flex-1 space-y-1.5">
-                          <div
-                            className="h-2.5 w-2/3 rounded animate-pulse"
+                        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 0.75 }}>
+                          <Box
+                            sx={{ height: 10, width: "66%", borderRadius: "4px", animation: "pulse 1.5s ease-in-out infinite" }}
                             style={{ background: border }}
                           />
-                          <div
-                            className="h-2 w-1/3 rounded animate-pulse"
+                          <Box
+                            sx={{ height: 8, width: "33%", borderRadius: "4px", animation: "pulse 1.5s ease-in-out infinite" }}
                             style={{ background: border }}
                           />
-                        </div>
-                      </div>
+                        </Box>
+                      </Box>
                     ))}
-                  </div>
-                </motion.div>
+                  </Box>
+                </Box>
               )}
 
               {cfg.faqOn && cfg.faqItems.length > 0 && (
-                <motion.div key="faq" {...sectionMotion} className="overflow-hidden">
-                  <div className="pb-4">
-                    <div className="text-[12px] font-bold mb-2" style={{ color: surfaceText }}>
+                <Box component={motion.div} key="faq" {...sectionMotion} sx={{ overflow: "hidden" }}>
+                  <Box sx={{ pb: 2 }}>
+                    <Box sx={{ fontSize: 12, fontWeight: 700, mb: 1 }} style={{ color: surfaceText }}>
                       Quick answers
-                    </div>
-                    <div
-                      className="rounded-xl overflow-hidden border"
+                    </Box>
+                    <Box
+                      sx={{ borderRadius: "12px", overflow: "hidden", border: "1px solid" }}
                       style={{ borderColor: border }}
                     >
                       {cfg.faqItems.map((f, i) => (
@@ -584,19 +726,31 @@ function OverviewWidgetInner({
                           last={i === cfg.faqItems.length - 1}
                         />
                       ))}
-                    </div>
-                  </div>
-                </motion.div>
+                    </Box>
+                  </Box>
+                </Box>
               )}
 
               {cfg.customLinksOn && cfg.linkItems.length > 0 && (
-                <motion.div key="links" {...sectionMotion} className="overflow-hidden">
-                  <div className="pb-4 space-y-2">
+                <Box component={motion.div} key="links" {...sectionMotion} sx={{ overflow: "hidden" }}>
+                  <Box sx={{ pb: 2, display: "flex", flexDirection: "column", gap: 1 }}>
                     {cfg.linkItems.map((l) => (
-                      <a
+                      <Box
+                        component="a"
                         key={l.id}
                         href={l.url || "#"}
-                        className="flex items-center justify-between px-4 h-11 rounded-xl border text-[13px] font-semibold"
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          px: 2,
+                          height: 44,
+                          borderRadius: "12px",
+                          border: "1px solid",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          textDecoration: "none",
+                        }}
                         style={{
                           borderColor: border,
                           color: surfaceText,
@@ -604,52 +758,55 @@ function OverviewWidgetInner({
                             cfg.appearance === "dark" ? "rgba(255,255,255,0.03)" : "white",
                         }}
                       >
-                        <span>{l.name || l.url || "Untitled link"}</span>
-                        <ChevronRight className="h-4 w-4" style={{ color: mutedText }} />
-                      </a>
+                        <Box component="span">{l.name || l.url || "Untitled link"}</Box>
+                        <ChevronRight style={{ height: 16, width: 16, color: mutedText }} />
+                      </Box>
                     ))}
-                  </div>
-                </motion.div>
+                  </Box>
+                </Box>
               )}
 
               {cfg.contactOn && cfg.contacts.length > 0 && (
-                <motion.div key="contacts" {...sectionMotion} className="overflow-hidden">
-                  <div className="pb-4">
-                    <div className="text-[12px] font-bold mb-2" style={{ color: surfaceText }}>
+                <Box component={motion.div} key="contacts" {...sectionMotion} sx={{ overflow: "hidden" }}>
+                  <Box sx={{ pb: 2 }}>
+                    <Box sx={{ fontSize: 12, fontWeight: 700, mb: 1 }} style={{ color: surfaceText }}>
                       Get in touch
-                    </div>
-                    <div className="space-y-2">
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       {cfg.contacts.map((c) => (
-                        <div
+                        <Box
                           key={c.id}
-                          className="rounded-xl border p-3 flex items-center gap-3"
+                          sx={{ borderRadius: "12px", border: "1px solid", p: 1.5, display: "flex", alignItems: "center", gap: 1.5 }}
                           style={{
                             borderColor: border,
                             background:
                               cfg.appearance === "dark" ? "rgba(255,255,255,0.03)" : "white",
                           }}
                         >
-                          <div
-                            className="h-9 w-9 rounded-full flex items-center justify-center text-white"
+                          <Box
+                            sx={{ height: 36, width: 36, borderRadius: "9999px", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}
                             style={{ background: cfg.theme, ...colorTransition }}
                           >
-                            <User className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div
-                              className="text-[13px] font-semibold truncate"
+                            <User style={{ height: 16, width: 16 }} />
+                          </Box>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Box
+                              sx={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                               style={{ color: surfaceText }}
                             >
                               {c.name || "Contact"}
-                            </div>
-                            <div className="text-[11px] truncate" style={{ color: mutedText }}>
+                            </Box>
+                            <Box
+                              sx={{ fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                              style={{ color: mutedText }}
+                            >
                               {c.role || c.email || c.phone}
-                            </div>
-                          </div>
-                          <div className="flex gap-1.5">
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: "flex", gap: 0.75 }}>
                             {c.email && (
-                              <div
-                                className="h-7 w-7 rounded-full flex items-center justify-center"
+                              <Box
+                                sx={{ height: 28, width: 28, borderRadius: "9999px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                 style={{
                                   background:
                                     cfg.appearance === "dark"
@@ -657,12 +814,12 @@ function OverviewWidgetInner({
                                       : "#f3f4f6",
                                 }}
                               >
-                                <Mail className="h-3.5 w-3.5" style={{ color: mutedText }} />
-                              </div>
+                                <Mail style={{ height: 14, width: 14, color: mutedText }} />
+                              </Box>
                             )}
                             {c.phone && (
-                              <div
-                                className="h-7 w-7 rounded-full flex items-center justify-center"
+                              <Box
+                                sx={{ height: 28, width: 28, borderRadius: "9999px", display: "flex", alignItems: "center", justifyContent: "center" }}
                                 style={{
                                   background:
                                     cfg.appearance === "dark"
@@ -670,34 +827,34 @@ function OverviewWidgetInner({
                                       : "#f3f4f6",
                                 }}
                               >
-                                <PhoneIcon className="h-3.5 w-3.5" style={{ color: mutedText }} />
-                              </div>
+                                <PhoneIcon style={{ height: 14, width: 14, color: mutedText }} />
+                              </Box>
                             )}
-                          </div>
-                        </div>
+                          </Box>
+                        </Box>
                       ))}
-                    </div>
-                  </div>
-                </motion.div>
+                    </Box>
+                  </Box>
+                </Box>
               )}
 
               {!cfg.faqOn && !cfg.contactOn && !cfg.entitiesOn && !cfg.customLinksOn && (
-                <motion.div key="empty" {...sectionMotion} className="overflow-hidden">
-                  <div
-                    className="rounded-xl border border-dashed p-5 text-center"
+                <Box component={motion.div} key="empty" {...sectionMotion} sx={{ overflow: "hidden" }}>
+                  <Box
+                    sx={{ borderRadius: "12px", border: "1px dashed", p: 2.5, textAlign: "center" }}
                     style={{ borderColor: border }}
                   >
-                    <div className="text-[12px] font-semibold" style={{ color: surfaceText }}>
+                    <Box sx={{ fontSize: 12, fontWeight: 600 }} style={{ color: surfaceText }}>
                       Your home tab is waiting ✨
-                    </div>
-                    <div className="text-[11px] mt-1" style={{ color: mutedText }}>
+                    </Box>
+                    <Box sx={{ fontSize: 11, mt: 0.5 }} style={{ color: mutedText }}>
                       Add FAQ, contacts, or live data cards from the conversation.
-                    </div>
-                  </div>
-                </motion.div>
+                    </Box>
+                  </Box>
+                </Box>
               )}
             </AnimatePresence>
-          </div>
+          </Box>
 
           <BottomTabs
             tab={tab}
@@ -710,18 +867,18 @@ function OverviewWidgetInner({
         </>
       ) : (
         <>
-          <div
-            className="h-14 flex items-center justify-between px-4 shrink-0"
+          <Box
+            sx={{ height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, flexShrink: 0 }}
             style={{ background: cfg.theme, ...colorTransition }}
           >
-            <div className="flex items-center gap-2 text-white">
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "white" }}>
               <AvatarLogo logoUrl={cfg.logoUrl} />
-              <div className="text-[13px] font-semibold">Messages</div>
-            </div>
-            <X className="h-4 w-4 text-white/80" />
-          </div>
-          <div
-            className="flex-1 p-4 space-y-2.5 overflow-y-auto"
+              <Box sx={{ fontSize: 13, fontWeight: 600 }}>Messages</Box>
+            </Box>
+            <X style={{ height: 16, width: 16, color: "rgba(255,255,255,0.8)" }} />
+          </Box>
+          <Box
+            sx={{ flex: 1, p: 2, display: "flex", flexDirection: "column", gap: 1.25, overflowY: "auto" }}
             style={{ background: surface, ...colorTransition }}
           >
             <MsgBubble
@@ -735,24 +892,26 @@ function OverviewWidgetInner({
               color={cfg.appearance === "dark" ? "#2a2c36" : "#f3f4f6"}
               fg={surfaceText}
             />
-          </div>
-          <div
-            className="border-t flex items-center px-3 gap-2 h-14 shrink-0"
+          </Box>
+          <Box
+            sx={{ borderTop: "1px solid", display: "flex", alignItems: "center", px: 1.5, gap: 1, height: 56, flexShrink: 0 }}
             style={{ borderColor: border, background: surface, ...colorTransition }}
           >
-            {cfg.attachOn && <Paperclip className="h-4 w-4" style={{ color: mutedText }} />}
-            <input
+            {cfg.attachOn && <Paperclip style={{ height: 16, width: 16, color: mutedText }} />}
+            <Box
+              component="input"
               placeholder="Type your message…"
-              className="flex-1 h-9 rounded-full px-3 text-[12px] outline-none border"
+              sx={{ flex: 1, height: 36, borderRadius: "9999px", px: 1.5, fontSize: 12, outline: "none", border: "1px solid" }}
               style={{ borderColor: border, background: "transparent", color: surfaceText }}
             />
-            <button
-              className="h-9 w-9 rounded-full flex items-center justify-center text-white"
+            <Box
+              component="button"
+              sx={{ height: 36, width: 36, borderRadius: "9999px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", border: "none", cursor: "pointer" }}
               style={{ background: cfg.theme, ...colorTransition }}
             >
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
+              <Send style={{ height: 16, width: 16 }} />
+            </Box>
+          </Box>
           <BottomTabs
             tab={tab}
             setTab={setTab}
@@ -808,176 +967,185 @@ export function EntityCardPreview({
 
   if (items.length === 0) {
     return (
-      <div
-        className="rounded-xl border p-3 flex items-center gap-3"
+      <Box
+        sx={{ borderRadius: "12px", border: "1px solid", p: 1.5, display: "flex", alignItems: "center", gap: 1.5 }}
         style={{ borderColor: border, background: cardBg }}
       >
-        <div
-          className="h-9 w-9 rounded-lg flex items-center justify-center text-white"
+        <Box
+          sx={{ height: 36, width: 36, borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}
           style={{ background: theme, ...colorTransition }}
         >
-          <Icon className="h-4 w-4" />
-        </div>
-        <div className="flex-1">
-          <div className="text-[13px] font-bold" style={{ color: surfaceText }}>
+          <Icon style={{ height: 16, width: 16 }} />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ fontSize: 13, fontWeight: 700 }} style={{ color: surfaceText }}>
             {entity.name}
-          </div>
-          <div className="text-[11px]" style={{ color: mutedText }}>
+          </Box>
+          <Box sx={{ fontSize: 11 }} style={{ color: mutedText }}>
             Connect an API to load data
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className="h-4 w-4" style={{ color: theme }} />
-        <div className="text-[12px] font-bold" style={{ color: surfaceText }}>
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <Icon style={{ height: 16, width: 16, color: theme }} />
+        <Box sx={{ fontSize: 12, fontWeight: 700 }} style={{ color: surfaceText }}>
           {entity.name}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {entity.layout === "grid" ? (
-        <div className="grid grid-cols-2 gap-2">
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1 }}>
           {items.map((it, i) => (
-            <div
+            <Box
               key={i}
-              className="rounded-xl border p-3"
+              sx={{ borderRadius: "12px", border: "1px solid", p: 1.5 }}
               style={{ borderColor: border, background: cardBg }}
             >
-              <div className="text-[12px] font-semibold" style={{ color: surfaceText }}>
+              <Box sx={{ fontSize: 12, fontWeight: 600 }} style={{ color: surfaceText }}>
                 {getField(it, entity.mapping.title) || "—"}
-              </div>
-              <div className="text-[11px] mt-0.5" style={{ color: mutedText }}>
+              </Box>
+              <Box sx={{ fontSize: 11, mt: 0.25 }} style={{ color: mutedText }}>
                 {getField(it, entity.mapping.subtitle)}
-              </div>
+              </Box>
               {entity.mapping.badge && (
-                <div
-                  className="mt-2 inline-flex text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                <Box
+                  sx={{ mt: 1, display: "inline-flex", fontSize: 10, fontWeight: 600, px: 1, py: 0.25, borderRadius: "9999px" }}
                   style={{ background: `${theme}22`, color: theme }}
                 >
                   {getField(it, entity.mapping.badge)}
-                </div>
+                </Box>
               )}
-            </div>
+            </Box>
           ))}
-        </div>
+        </Box>
       ) : entity.layout === "compact" ? (
-        <div className="rounded-xl border overflow-hidden" style={{ borderColor: border }}>
+        <Box sx={{ borderRadius: "12px", border: "1px solid", overflow: "hidden" }} style={{ borderColor: border }}>
           {items.map((it, i) => (
-            <div
+            <Box
               key={i}
-              className="flex items-center justify-between px-3 py-2"
+              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 1.5, py: 1 }}
               style={{ borderTop: i === 0 ? "none" : `1px solid ${border}`, background: cardBg }}
             >
-              <div className="text-[12.5px] font-medium truncate" style={{ color: surfaceText }}>
+              <Box
+                sx={{ fontSize: 12.5, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                style={{ color: surfaceText }}
+              >
                 {getField(it, entity.mapping.title) || "—"}
-              </div>
+              </Box>
               {entity.mapping.badge && (
-                <div
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ml-2"
+                <Box
+                  sx={{ fontSize: 10, fontWeight: 600, px: 1, py: 0.25, borderRadius: "9999px", flexShrink: 0, ml: 1 }}
                   style={{ background: `${theme}22`, color: theme }}
                 >
                   {getField(it, entity.mapping.badge)}
-                </div>
+                </Box>
               )}
-            </div>
+            </Box>
           ))}
-        </div>
+        </Box>
       ) : entity.layout === "card" ? (
-        <div className="space-y-2">
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {items.map((it, i) => (
-            <div
+            <Box
               key={i}
-              className="rounded-xl border p-3 shadow-sm"
+              sx={{ borderRadius: "12px", border: "1px solid", p: 1.5, boxShadow: 1 }}
               style={{ borderColor: border, background: cardBg }}
             >
-              <div className="flex items-start gap-3">
-                <div
-                  className="h-10 w-10 rounded-lg flex items-center justify-center text-white shrink-0"
+              <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
+                <Box
+                  sx={{ height: 40, width: 40, borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}
                   style={{ background: theme, ...colorTransition }}
                 >
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <div className="text-[13px] font-bold truncate" style={{ color: surfaceText }}>
+                  <Icon style={{ height: 16, width: 16 }} />
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box
+                      sx={{ fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                      style={{ color: surfaceText }}
+                    >
                       {getField(it, entity.mapping.title) || "—"}
-                    </div>
+                    </Box>
                     {entity.mapping.tag && (
-                      <div
-                        className="text-[9px] font-bold uppercase tracking-wide"
+                      <Box
+                        sx={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}
                         style={{ color: theme }}
                       >
                         {getField(it, entity.mapping.tag)}
-                      </div>
+                      </Box>
                     )}
-                  </div>
-                  <div className="text-[11px]" style={{ color: mutedText }}>
+                  </Box>
+                  <Box sx={{ fontSize: 11 }} style={{ color: mutedText }}>
                     {getField(it, entity.mapping.subtitle)}
-                  </div>
+                  </Box>
                   {entity.mapping.description && (
-                    <div className="text-[11px] mt-1" style={{ color: mutedText }}>
+                    <Box sx={{ fontSize: 11, mt: 0.5 }} style={{ color: mutedText }}>
                       {getField(it, entity.mapping.description)}
-                    </div>
+                    </Box>
                   )}
                   {entity.mapping.badge && (
-                    <div
-                      className="mt-2 inline-flex text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                    <Box
+                      sx={{ mt: 1, display: "inline-flex", fontSize: 10, fontWeight: 600, px: 1, py: 0.25, borderRadius: "9999px" }}
                       style={{ background: `${theme}22`, color: theme }}
                     >
                       {getField(it, entity.mapping.badge)}
-                    </div>
+                    </Box>
                   )}
-                </div>
-              </div>
-            </div>
+                </Box>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </Box>
       ) : (
-        <div
-          className="rounded-xl border overflow-hidden"
+        <Box
+          sx={{ borderRadius: "12px", border: "1px solid", overflow: "hidden" }}
           style={{ borderColor: border, background: cardBg }}
         >
           {items.map((it, i) => (
-            <div
+            <Box
               key={i}
-              className="flex items-center gap-3 px-3 py-2.5"
+              sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 1.5, py: 1.25 }}
               style={{ borderTop: i === 0 ? "none" : `1px solid ${border}` }}
             >
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-white shrink-0"
+              <Box
+                sx={{ height: 32, width: 32, borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}
                 style={{ background: theme, ...colorTransition }}
               >
-                <Icon className="h-3.5 w-3.5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div
-                  className="text-[12.5px] font-semibold truncate"
+                <Icon style={{ height: 14, width: 14 }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box
+                  sx={{ fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                   style={{ color: surfaceText }}
                 >
                   {getField(it, entity.mapping.title) || "—"}
-                </div>
-                <div className="text-[11px] truncate" style={{ color: mutedText }}>
+                </Box>
+                <Box
+                  sx={{ fontSize: 11, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                  style={{ color: mutedText }}
+                >
                   {getField(it, entity.mapping.subtitle)}
-                </div>
-              </div>
+                </Box>
+              </Box>
               {entity.mapping.badge && (
-                <div
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0"
+                <Box
+                  sx={{ fontSize: 10, fontWeight: 600, px: 1, py: 0.25, borderRadius: "9999px", flexShrink: 0 }}
                   style={{ background: `${theme}22`, color: theme }}
                 >
                   {getField(it, entity.mapping.badge)}
-                </div>
+                </Box>
               )}
-              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: mutedText }} />
-            </div>
+              <ChevronRight style={{ height: 16, width: 16, flexShrink: 0, color: mutedText }} />
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }
 
@@ -1008,8 +1176,8 @@ function BottomTabs({
   surface: string;
 }) {
   return (
-    <div
-      className="h-14 border-t flex items-stretch shrink-0"
+    <Box
+      sx={{ height: 56, borderTop: "1px solid", display: "flex", alignItems: "stretch", flexShrink: 0 }}
       style={{ borderColor: border, background: surface, ...colorTransition }}
     >
       {[
@@ -1018,18 +1186,31 @@ function BottomTabs({
       ].map(({ k, label, icon: Icon }) => {
         const active = tab === k;
         return (
-          <button
+          <Box
+            component="button"
             key={k}
             onClick={() => setTab(k)}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5"
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 0.25,
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+            }}
             style={{ color: active ? theme : mutedText }}
           >
-            <Icon className="h-[18px] w-[18px]" />
-            <span className="text-[10px] font-semibold">{label}</span>
-          </button>
+            <Icon style={{ height: 18, width: 18 }} />
+            <Box component="span" sx={{ fontSize: 10, fontWeight: 600 }}>
+              {label}
+            </Box>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 }
 
@@ -1045,12 +1226,12 @@ function MsgBubble({
   right?: boolean;
 }) {
   return (
-    <div
-      className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[12.5px] ${right ? "ml-auto" : ""}`}
+    <Box
+      sx={{ maxWidth: "80%", borderRadius: "16px", px: 1.75, py: 1.25, fontSize: 12.5, ml: right ? "auto" : 0 }}
       style={{ background: color, color: fg, ...colorTransition }}
     >
       {text}
-    </div>
+    </Box>
   );
 }
 
@@ -1073,33 +1254,52 @@ function FaqAccordion({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: last ? "none" : `1px solid ${border}` }}>
-      <button
+    <Box style={{ borderBottom: last ? "none" : `1px solid ${border}` }}>
+      <Box
+        component="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        sx={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 2,
+          py: 1.5,
+          textAlign: "left",
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+        }}
       >
-        <span className="text-[13px] font-semibold pr-3" style={{ color: surfaceText }}>
+        <Box component="span" sx={{ fontSize: 13, fontWeight: 600, pr: 1.5 }} style={{ color: surfaceText }}>
           {question}
-        </span>
+        </Box>
         <ChevronRight
-          className="h-4 w-4 shrink-0 transition-transform"
-          style={{ color: theme, transform: open ? "rotate(90deg)" : "none" }}
+          style={{
+            height: 16,
+            width: 16,
+            flexShrink: 0,
+            transition: "transform 0.2s",
+            color: theme,
+            transform: open ? "rotate(90deg)" : "none",
+          }}
         />
-      </button>
+      </Box>
       <AnimatePresence initial={false}>
         {open && answer && (
-          <motion.div
+          <Box
+            component={motion.div}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
+            sx={{ overflow: "hidden" }}
           >
-            <div className="px-4 pb-3 text-[12px] leading-relaxed" style={{ color: mutedText }}>
+            <Box sx={{ px: 2, pb: 1.5, fontSize: 12, lineHeight: 1.6 }} style={{ color: mutedText }}>
               {answer}
-            </div>
-          </motion.div>
+            </Box>
+          </Box>
         )}
       </AnimatePresence>
-    </div>
+    </Box>
   );
 }

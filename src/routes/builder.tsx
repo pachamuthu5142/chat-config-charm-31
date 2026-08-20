@@ -2,17 +2,26 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft,
-  Bot,
-  Check,
-  Copy,
-  MessageSquare,
-  Pencil,
-  Redo2,
-  RotateCcw,
-  Sparkles,
-  Undo2,
-} from "lucide-react";
+  Box,
+  Button,
+  IconButton,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
+import {
+  ArrowBack,
+  Check as CheckIcon,
+  ContentCopy,
+  Edit as EditIcon,
+  Redo,
+  RestartAlt,
+  SmartToy,
+  Undo,
+  AutoAwesome,
+  Forum,
+} from "@mui/icons-material";
+import { ACCENT, SIDEBAR_BG } from "../theme";
 import { embedCode, themeName, type Tab } from "../widget/config";
 import { WidgetPreview } from "../widget/WidgetPreview";
 import {
@@ -45,8 +54,6 @@ import type { EntityCardCfg } from "../widget/config";
 export const Route = createFileRoute("/builder")({
   component: BuilderPage,
 });
-
-const ACCENT = "#f05742";
 
 /** A selection made but not yet confirmed — previewed live, committed on confirm. */
 type Pending = { stepId: string; value: AnswerValue } | null;
@@ -83,90 +90,165 @@ function BuilderPage() {
   }, [b.done]);
 
   return (
-    <div
-      className="font-sans h-screen w-screen overflow-hidden flex flex-col text-[13px] text-neutral-800 antialiased"
-      style={{
+    <Box
+      sx={{
         fontFamily: '"DM Sans", ui-sans-serif, system-ui, sans-serif',
         background: "#f7f7f8",
+        height: "100vh",
+        width: "100vw",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        fontSize: 13,
+        color: "neutral.800",
+        WebkitFontSmoothing: "antialiased",
       }}
     >
       {/* top bar */}
-      <header className="h-14 shrink-0 px-4 lg:px-6 flex items-center gap-3 border-b border-black/5 bg-white">
-        <Link
+      <Box
+        component="header"
+        sx={{
+          height: 56,
+          flexShrink: 0,
+          px: { xs: 2, lg: 3 },
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          borderBottom: "1px solid",
+          borderColor: "rgba(0,0,0,0.05)",
+          bgcolor: "white",
+        }}
+      >
+        <Box
+          component={Link}
           to="/"
-          className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:bg-neutral-100"
           title="Classic form builder"
+          sx={{
+            height: 32,
+            width: 32,
+            borderRadius: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "neutral.500",
+            textDecoration: "none",
+            "&:hover": { bgcolor: "neutral.100" },
+          }}
         >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <div
-          className="h-8 w-8 rounded-lg flex items-center justify-center"
-          style={{ background: ACCENT }}
+          <ArrowBack sx={{ fontSize: 16 }} />
+        </Box>
+        <Box
+          sx={{
+            height: 32,
+            width: 32,
+            borderRadius: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: ACCENT,
+          }}
         >
-          <MessageSquare className="h-4 w-4 text-white" />
-        </div>
-        <div className="leading-tight">
-          <div className="text-[13px] font-bold text-neutral-900">Widget Designer</div>
-          <div className="text-[10.5px] text-neutral-400">Conversational builder</div>
-        </div>
+          <Forum sx={{ fontSize: 16, color: "white" }} />
+        </Box>
+        <Box sx={{ lineHeight: 1.2 }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 700, color: "neutral.900" }}>
+            Widget Designer
+          </Typography>
+          <Typography sx={{ fontSize: 10.5, color: "neutral.400" }}>
+            Conversational builder
+          </Typography>
+        </Box>
 
         {/* progress */}
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="w-full max-w-56 hidden sm:flex items-center gap-2.5">
-            <div className="flex-1 h-1.5 rounded-full bg-neutral-100 overflow-hidden">
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: ACCENT }}
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", px: 2 }}>
+          <Stack
+            direction="row"
+            sx={{
+              width: "100%",
+              maxWidth: 224,
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              gap: 1.25,
+            }}
+          >
+            <Box sx={{ flex: 1, height: 6, borderRadius: 999, bgcolor: "neutral.100", overflow: "hidden" }}>
+              <Box
+                component={motion.div}
+                style={{ background: ACCENT, height: "100%", borderRadius: 999 }}
                 animate={{ width: `${b.progress}%` }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               />
-            </div>
-            <span className="text-[11px] font-semibold text-neutral-500 tabular-nums">
+            </Box>
+            <Typography
+              sx={{ fontSize: 11, fontWeight: 600, color: "neutral.500", fontVariantNumeric: "tabular-nums" }}
+            >
               {b.progress}%
-            </span>
-          </div>
-        </div>
+            </Typography>
+          </Stack>
+        </Box>
 
-        <div className="flex items-center gap-1">
+        <Stack direction="row" sx={{ alignItems: "center", gap: 0.5 }}>
           <IconBtn title="Undo" disabled={!b.canUndo} onClick={b.undo}>
-            <Undo2 className="h-4 w-4" />
+            <Undo sx={{ fontSize: 16 }} />
           </IconBtn>
           <IconBtn title="Redo" disabled={!b.canRedo} onClick={b.redo}>
-            <Redo2 className="h-4 w-4" />
+            <Redo sx={{ fontSize: 16 }} />
           </IconBtn>
           <IconBtn
             title="Start over"
             disabled={Object.keys(b.answers).length === 0}
             onClick={b.restart}
           >
-            <RotateCcw className="h-4 w-4" />
+            <RestartAlt sx={{ fontSize: 16 }} />
           </IconBtn>
-        </div>
-      </header>
+        </Stack>
+      </Box>
 
       {/* mobile pane switch */}
-      <div className="lg:hidden flex border-b border-black/5 bg-white">
+      <Stack
+        direction="row"
+        sx={{ display: { xs: "flex", lg: "none" }, borderBottom: "1px solid", borderColor: "rgba(0,0,0,0.05)", bgcolor: "white" }}
+      >
         {(["chat", "preview"] as const).map((k) => (
-          <button
+          <Box
+            component="button"
             key={k}
             onClick={() => setMobilePane(k)}
-            className="flex-1 h-10 text-[12px] font-semibold capitalize border-b-2 transition"
-            style={{
+            sx={{
+              flex: 1,
+              height: 40,
+              fontSize: 12,
+              fontWeight: 600,
+              textTransform: "capitalize",
+              border: "none",
+              borderBottom: "2px solid",
+              transition: "all 0.15s",
+              bgcolor: "transparent",
+              cursor: "pointer",
               borderColor: mobilePane === k ? ACCENT : "transparent",
               color: mobilePane === k ? "#111" : "#9ca3af",
             }}
           >
             {k === "chat" ? "Conversation" : "Preview"}
-          </button>
+          </Box>
         ))}
-      </div>
+      </Stack>
 
-      <div className="flex-1 flex min-h-0">
+      <Box sx={{ flex: 1, display: "flex", minHeight: 0 }}>
         {/* left: conversation */}
-        <section
-          className={`${mobilePane === "chat" ? "flex" : "hidden"} lg:flex flex-col w-full lg:w-[420px] xl:w-[460px] shrink-0 bg-white border-r border-black/5`}
+        <Box
+          component="section"
+          sx={{
+            display: { xs: mobilePane === "chat" ? "flex" : "none", lg: "flex" },
+            flexDirection: "column",
+            width: { xs: "100%", lg: 420, xl: 460 },
+            flexShrink: 0,
+            bgcolor: "white",
+            borderRight: "1px solid",
+            borderColor: "rgba(0,0,0,0.05)",
+          }}
         >
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+          <Box ref={scrollRef} sx={{ flex: 1, overflowY: "auto", px: 2.5, py: 3, display: "flex", flexDirection: "column", gap: 3 }}>
             {b.steps.map((step) => {
               const answered = step.id in b.answers && step.kind !== "finish";
               const isCurrent = b.currentStep?.id === step.id;
@@ -208,26 +290,69 @@ function BuilderPage() {
             })}
 
             {b.done && !b.editing && <CompletionBlock builder={b} />}
-          </div>
-        </section>
+          </Box>
+        </Box>
 
         {/* center: live preview */}
-        <section
-          className={`${mobilePane === "preview" ? "block" : "hidden"} lg:block flex-1 relative min-w-0`}
-          style={{ background: "#eceef1" }}
+        <Box
+          component="section"
+          sx={{
+            display: { xs: mobilePane === "preview" ? "block" : "none", lg: "block" },
+            flex: 1,
+            position: "relative",
+            minWidth: 0,
+            background: "#eceef1",
+          }}
         >
-          <div className="absolute top-0 inset-x-0 h-12 px-5 flex items-center justify-between z-20 pointer-events-none">
-            <div className="text-[10.5px] font-semibold tracking-[0.14em] text-neutral-400">
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 48,
+              px: 2.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              zIndex: 20,
+              pointerEvents: "none",
+            }}
+          >
+            <Typography sx={{ fontSize: 10.5, fontWeight: 600, letterSpacing: "0.14em", color: "neutral.400" }}>
               LIVE PREVIEW
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-neutral-500">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
+            </Typography>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, fontSize: 11, color: "neutral.500" }}>
+              <Box sx={{ position: "relative", display: "flex", height: 8, width: 8 }}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    display: "inline-flex",
+                    height: "100%",
+                    width: "100%",
+                    borderRadius: "50%",
+                    bgcolor: "success.light",
+                    opacity: 0.6,
+                    animation: "ping 1.5s cubic-bezier(0,0,0.2,1) infinite",
+                    "@keyframes ping": {
+                      "75%, 100%": { transform: "scale(2)", opacity: 0 },
+                    },
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "relative",
+                    display: "inline-flex",
+                    borderRadius: "50%",
+                    height: 8,
+                    width: 8,
+                    bgcolor: "success.main",
+                  }}
+                />
+              </Box>
               Updates as you answer
-            </div>
-          </div>
+            </Stack>
+          </Box>
           <WidgetPreview
             cfg={previewCfg}
             tab={previewTab}
@@ -236,14 +361,38 @@ function BuilderPage() {
             entityTesting={entityTesting}
             celebrate={celebrate}
           />
-        </section>
+        </Box>
 
         {/* right: configuration timeline */}
-        <aside className="hidden xl:flex w-64 shrink-0 flex-col bg-white border-l border-black/5">
-          <div className="h-12 px-4 flex items-center text-[10.5px] font-semibold tracking-[0.14em] text-neutral-400 border-b border-black/5">
+        <Box
+          component="aside"
+          sx={{
+            display: { xs: "none", xl: "flex" },
+            width: 256,
+            flexShrink: 0,
+            flexDirection: "column",
+            bgcolor: "white",
+            borderLeft: "1px solid",
+            borderColor: "rgba(0,0,0,0.05)",
+          }}
+        >
+          <Box
+            sx={{
+              height: 48,
+              px: 2,
+              display: "flex",
+              alignItems: "center",
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              color: "neutral.400",
+              borderBottom: "1px solid",
+              borderColor: "rgba(0,0,0,0.05)",
+            }}
+          >
             YOUR CONFIGURATION
-          </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-1">
+          </Box>
+          <Box sx={{ flex: 1, overflowY: "auto", p: 1.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
             <AnimatePresence initial={false}>
               {b.steps
                 .filter((s) => s.kind !== "finish")
@@ -251,7 +400,8 @@ function BuilderPage() {
                   const answered = step.id in b.answers;
                   const active = b.currentStep?.id === step.id || b.editing === step.id;
                   return (
-                    <motion.button
+                    <Box
+                      component={motion.button}
                       key={step.id}
                       layout
                       initial={{ opacity: 0, x: 12 }}
@@ -263,61 +413,110 @@ function BuilderPage() {
                         }
                       }}
                       disabled={!answered}
-                      className="w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition group disabled:cursor-default enabled:hover:bg-neutral-50"
-                      style={active ? { background: "#fff5f2" } : undefined}
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 1.25,
+                        borderRadius: 2,
+                        px: 1.25,
+                        py: 1,
+                        textAlign: "left",
+                        transition: "background 0.15s",
+                        border: "none",
+                        background: active ? "#fff5f2" : "transparent",
+                        cursor: answered ? "pointer" : "default",
+                        "&:hover": answered ? { bgcolor: active ? "#fff5f2" : "neutral.50" } : undefined,
+                        "&:hover .MuiSvgIcon-fontSizeSmall:last-of-type": { opacity: 1 },
+                      }}
                     >
-                      <span
-                        className="mt-0.5 h-5 w-5 rounded-full flex items-center justify-center shrink-0 border transition"
-                        style={{
+                      <Box
+                        sx={{
+                          mt: 0.25,
+                          height: 20,
+                          width: 20,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          border: "1px solid",
+                          transition: "all 0.15s",
                           background: answered ? "#16a34a" : "white",
                           borderColor: answered ? "#16a34a" : active ? ACCENT : "#e5e7eb",
                         }}
                       >
                         {answered ? (
-                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                          <CheckIcon sx={{ fontSize: 12, color: "white" }} />
                         ) : active ? (
-                          <span
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{ background: ACCENT }}
-                          />
+                          <Box sx={{ height: 6, width: 6, borderRadius: "50%", background: ACCENT }} />
                         ) : null}
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-[12px] font-semibold text-neutral-800">
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography sx={{ display: "block", fontSize: 12, fontWeight: 600, color: "neutral.800" }}>
                           {step.label}
-                        </span>
-                        <span className="block text-[11px] text-neutral-400 truncate">
+                        </Typography>
+                        <Typography
+                          sx={{
+                            display: "block",
+                            fontSize: 11,
+                            color: "neutral.400",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
                           {answered
                             ? step.summarize(b.answers[step.id], b.config)
                             : active
                               ? "Deciding now…"
                               : "Up next"}
-                        </span>
-                      </span>
+                        </Typography>
+                      </Box>
                       {answered && (
-                        <Pencil className="h-3 w-3 mt-1 text-neutral-300 opacity-0 group-hover:opacity-100 transition shrink-0" />
+                        <EditIcon
+                          fontSize="small"
+                          sx={{ fontSize: "12px !important", mt: 0.5, color: "neutral.300", opacity: 0, transition: "opacity 0.15s", flexShrink: 0 }}
+                        />
                       )}
-                    </motion.button>
+                    </Box>
                   );
                 })}
             </AnimatePresence>
-          </div>
-          {step_theme_chip(previewCfg.theme)}
-        </aside>
-      </div>
-    </div>
+          </Box>
+          <ThemeChip theme={previewCfg.theme} />
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
-function step_theme_chip(theme: string) {
+function ThemeChip({ theme }: { theme: string }) {
   return (
-    <div className="p-3 border-t border-black/5 flex items-center gap-2 text-[11px] text-neutral-500">
-      <span
-        className="h-4 w-4 rounded-full border border-black/10"
-        style={{ background: theme, transition: "background 500ms ease" }}
+    <Stack
+      direction="row"
+      sx={{
+        p: 1.5,
+        borderTop: "1px solid",
+        borderColor: "rgba(0,0,0,0.05)",
+        alignItems: "center",
+        gap: 1,
+        fontSize: 11,
+        color: "neutral.500",
+      }}
+    >
+      <Box
+        sx={{
+          height: 16,
+          width: 16,
+          borderRadius: "50%",
+          border: "1px solid rgba(0,0,0,0.1)",
+          background: theme,
+          transition: "background 500ms ease",
+        }}
       />
       Brand color · {themeName(theme)}
-    </div>
+    </Stack>
   );
 }
 
@@ -333,14 +532,22 @@ function IconBtn({
   onClick: () => void;
 }) {
   return (
-    <button
+    <IconButton
       title={title}
       disabled={disabled}
       onClick={onClick}
-      className="h-8 w-8 rounded-lg flex items-center justify-center text-neutral-500 hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition"
+      size="small"
+      sx={{
+        height: 32,
+        width: 32,
+        borderRadius: 2,
+        color: "neutral.500",
+        "&:hover": { bgcolor: "neutral.100" },
+        "&.Mui-disabled": { opacity: 0.3 },
+      }}
     >
       {children}
-    </button>
+    </IconButton>
   );
 }
 
@@ -365,66 +572,127 @@ function StepBlock({
   children: React.ReactNode;
 }) {
   return (
-    <motion.div
+    <Box
+      component={motion.div}
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="space-y-3"
+      sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
     >
       {/* assistant bubble */}
-      <div className="flex gap-2.5">
-        <div
-          className="h-7 w-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-          style={{ background: ACCENT }}
+      <Stack direction="row" sx={{ gap: 1.25 }}>
+        <Box
+          sx={{
+            height: 28,
+            width: 28,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            mt: 0.25,
+            background: ACCENT,
+          }}
         >
-          <Bot className="h-3.5 w-3.5 text-white" />
-        </div>
-        <div className="max-w-[85%]">
-          <div className="rounded-2xl rounded-tl-md bg-neutral-100 px-3.5 py-2.5 text-[13px] leading-relaxed text-neutral-800">
+          <SmartToy sx={{ fontSize: 14, color: "white" }} />
+        </Box>
+        <Box sx={{ maxWidth: "85%" }}>
+          <Box
+            sx={{
+              borderRadius: "16px",
+              borderTopLeftRadius: 6,
+              bgcolor: "neutral.100",
+              px: 1.75,
+              py: 1.25,
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "neutral.800",
+            }}
+          >
             {step.prompt}
-          </div>
+          </Box>
           {step.hint && isActive && (
-            <div className="text-[11px] text-neutral-400 mt-1 ml-1">{step.hint}</div>
+            <Typography sx={{ fontSize: 11, color: "neutral.400", mt: 0.5, ml: 0.5 }}>{step.hint}</Typography>
           )}
-        </div>
-      </div>
+        </Box>
+      </Stack>
 
       {/* answered → user bubble with hover-edit */}
       {answered && !isEditing && (
-        <div className="flex justify-end group">
-          <div className="flex items-center gap-2">
-            <button
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            "&:hover button": { opacity: 1 },
+          }}
+        >
+          <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
+            <Box
+              component="button"
               onClick={onEdit}
-              className="opacity-0 group-hover:opacity-100 transition inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-400 hover:text-[#f05742]"
+              sx={{
+                opacity: 0,
+                transition: "opacity 0.15s, color 0.15s",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                fontSize: 11,
+                fontWeight: 600,
+                color: "neutral.400",
+                border: "none",
+                bgcolor: "transparent",
+                cursor: "pointer",
+                "&:hover": { color: ACCENT },
+              }}
             >
-              <Pencil className="h-3 w-3" /> Edit
-            </button>
-            <div
-              className="rounded-2xl rounded-tr-md px-3.5 py-2.5 text-[13px] font-medium text-white max-w-[75%]"
-              style={{ background: "#1e2028" }}
+              <EditIcon sx={{ fontSize: 12 }} /> Edit
+            </Box>
+            <Box
+              sx={{
+                borderRadius: "16px",
+                borderTopRightRadius: 6,
+                px: 1.75,
+                py: 1.25,
+                fontSize: 13,
+                fontWeight: 500,
+                color: "white",
+                maxWidth: "75%",
+                background: SIDEBAR_BG,
+              }}
             >
               {summary}
-            </div>
-          </div>
-        </div>
+            </Box>
+          </Stack>
+        </Box>
       )}
 
       {/* active control */}
       {isActive && (
-        <div className="pl-9 space-y-2">
+        <Box sx={{ pl: 4.5, display: "flex", flexDirection: "column", gap: 1 }}>
           {children}
           {isEditing && (
-            <button
+            <Box
+              component="button"
               onClick={onCancelEdit}
-              className="text-[11.5px] text-neutral-400 hover:text-neutral-600 underline underline-offset-2"
+              sx={{
+                alignSelf: "flex-start",
+                fontSize: 11.5,
+                color: "neutral.400",
+                textDecoration: "underline",
+                textUnderlineOffset: "2px",
+                border: "none",
+                bgcolor: "transparent",
+                cursor: "pointer",
+                "&:hover": { color: "neutral.600" },
+              }}
             >
               Never mind — keep my answer
-            </button>
+            </Box>
           )}
-        </div>
+        </Box>
       )}
-    </motion.div>
+    </Box>
   );
 }
 
@@ -461,15 +729,25 @@ function StepControl({
   const selected =
     typeof pendingVal === "string" ? pendingVal : typeof prev === "string" ? prev : undefined;
   const confirmRow = pendingVal !== undefined && (
-    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="pt-1">
-      <button
+    <Box component={motion.div} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} sx={{ pt: 0.5 }}>
+      <Button
         onClick={() => commit()}
-        className="h-9 px-4 rounded-full text-[12.5px] font-semibold text-white inline-flex items-center gap-1.5"
-        style={{ background: ACCENT }}
+        variant="contained"
+        disableElevation
+        startIcon={<CheckIcon sx={{ fontSize: 14 }} />}
+        sx={{
+          height: 36,
+          px: 2.5,
+          borderRadius: 999,
+          fontSize: 12.5,
+          fontWeight: 600,
+          background: ACCENT,
+          "&:hover": { background: ACCENT, filter: "brightness(0.95)" },
+        }}
       >
-        <Check className="h-3.5 w-3.5" strokeWidth={3} /> Confirm
-      </button>
-    </motion.div>
+        Confirm
+      </Button>
+    </Box>
   );
 
   switch (step.kind) {
@@ -703,131 +981,228 @@ function CompletionBlock({ builder: b }: { builder: ReturnType<typeof useBuilder
   ];
 
   return (
-    <motion.div
+    <Box
+      component={motion.div}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="space-y-4"
+      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
     >
-      <div className="flex gap-2.5">
-        <div
-          className="h-7 w-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-          style={{ background: ACCENT }}
+      <Stack direction="row" sx={{ gap: 1.25 }}>
+        <Box
+          sx={{
+            height: 28,
+            width: 28,
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            mt: 0.25,
+            background: ACCENT,
+          }}
         >
-          <Sparkles className="h-3.5 w-3.5 text-white" />
-        </div>
-        <div className="rounded-2xl rounded-tl-md bg-neutral-100 px-3.5 py-2.5 text-[13px] leading-relaxed text-neutral-800 max-w-[85%]">
+          <AutoAwesome sx={{ fontSize: 14, color: "white" }} />
+        </Box>
+        <Box
+          sx={{
+            borderRadius: "16px",
+            borderTopLeftRadius: 6,
+            bgcolor: "neutral.100",
+            px: 1.75,
+            py: 1.25,
+            fontSize: 13,
+            lineHeight: 1.6,
+            color: "neutral.800",
+            maxWidth: "85%",
+          }}
+        >
           🎉 Your widget is ready! Here's what we built together:
-        </div>
-      </div>
+        </Box>
+      </Stack>
 
-      <div className="pl-9 space-y-3">
-        <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-1.5">
+      <Box sx={{ pl: 4.5, display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Box sx={{ borderRadius: 3, border: "1px solid", borderColor: "neutral.200", bgcolor: "white", p: 1.5, display: "flex", flexDirection: "column", gap: 0.75 }}>
           {checklist.map((c, i) => (
-            <motion.div
+            <Stack
+              component={motion.div}
               key={c.label}
+              direction="row"
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15 + i * 0.12 }}
-              className="flex items-center gap-2 text-[12.5px]"
+              sx={{ alignItems: "center", gap: 1, fontSize: 12.5 }}
             >
-              <span
-                className="h-5 w-5 rounded-full flex items-center justify-center"
-                style={{ background: c.done ? "#16a34a" : "#e5e7eb" }}
+              <Box
+                sx={{
+                  height: 20,
+                  width: 20,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: c.done ? "#16a34a" : "#e5e7eb",
+                }}
               >
-                <Check className="h-3 w-3 text-white" strokeWidth={3} />
-              </span>
-              <span className={c.done ? "text-neutral-800 font-medium" : "text-neutral-400"}>
+                <CheckIcon sx={{ fontSize: 12, color: "white" }} />
+              </Box>
+              <Typography
+                component="span"
+                sx={{ fontSize: 12.5, color: c.done ? "neutral.800" : "neutral.400", fontWeight: c.done ? 500 : 400 }}
+              >
                 {c.label}
                 {!c.done && " · skipped"}
-              </span>
-            </motion.div>
+              </Typography>
+            </Stack>
           ))}
-        </div>
+        </Box>
 
         {!showCode ? (
-          <button
+          <Button
             onClick={() => setShowCode(true)}
-            className="h-10 px-5 rounded-xl text-white text-[13px] font-semibold shadow-sm hover:brightness-95 transition"
-            style={{ background: ACCENT }}
+            variant="contained"
+            disableElevation
+            sx={{
+              alignSelf: "flex-start",
+              height: 40,
+              px: 2.5,
+              borderRadius: 3,
+              color: "white",
+              fontSize: 13,
+              fontWeight: 600,
+              boxShadow: 1,
+              background: ACCENT,
+              "&:hover": { background: ACCENT, filter: "brightness(0.95)" },
+            }}
           >
             Generate embed code
-          </button>
+          </Button>
         ) : (
-          <motion.div
+          <Box
+            component={motion.div}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            className="overflow-hidden"
+            sx={{ overflow: "hidden" }}
           >
-            <div className="relative rounded-xl bg-neutral-900 text-neutral-100 p-4 pr-20 font-mono text-[11px] leading-[1.6] whitespace-pre-wrap break-all">
+            <Box
+              sx={{
+                position: "relative",
+                borderRadius: 3,
+                bgcolor: "#171717",
+                color: "#f5f5f5",
+                p: 2,
+                pr: 10,
+                fontFamily: "monospace",
+                fontSize: 11,
+                lineHeight: 1.6,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+              }}
+            >
               {code}
-              <button
+              <Box
+                component="button"
                 onClick={() => {
                   navigator.clipboard?.writeText(code);
                   setCopied(true);
                   setTimeout(() => setCopied(false), 1500);
                 }}
-                className="absolute top-2.5 right-2.5 h-7 px-2.5 rounded-md text-[11px] font-semibold text-neutral-900 bg-white hover:bg-neutral-100 flex items-center gap-1"
+                sx={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  height: 28,
+                  px: 1.25,
+                  borderRadius: 1.5,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "#171717",
+                  bgcolor: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  "&:hover": { bgcolor: "neutral.100" },
+                }}
               >
-                <Copy className="h-3 w-3" /> {copied ? "Copied!" : "Copy"}
-              </button>
-            </div>
-            <div className="text-[11.5px] text-neutral-500 mt-2 space-y-0.5">
-              <div>
+                <ContentCopy sx={{ fontSize: 12 }} /> {copied ? "Copied!" : "Copy"}
+              </Box>
+            </Box>
+            <Box sx={{ fontSize: 11.5, color: "neutral.500", mt: 1, display: "flex", flexDirection: "column", gap: 0.25 }}>
+              <Box>
                 Renders:{" "}
-                <span className="font-medium">
+                <Box component="span" sx={{ fontWeight: 500 }}>
                   {b.config.mountMode === "element"
                     ? `inside ${b.config.mountSelector}`
                     : "floating at the page root"}
-                </span>
-              </div>
+                </Box>
+              </Box>
               {b.config.siteUrls.trim() && (
-                <div>
-                  Appears on: <span className="font-medium">{b.config.siteUrls}</span>
-                </div>
+                <Box>
+                  Appears on: <Box component="span" sx={{ fontWeight: 500 }}>{b.config.siteUrls}</Box>
+                </Box>
               )}
-            </div>
+            </Box>
 
             {/* platform instructions */}
-            <div className="mt-4">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-2">
+            <Box sx={{ mt: 2 }}>
+              <Typography sx={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "neutral.400", mb: 1 }}>
                 How to install
-              </div>
-              <div className="flex flex-wrap gap-1.5 mb-2.5">
+              </Typography>
+              <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.75, mb: 1.25 }}>
                 {PLATFORMS.map((pl) => {
                   const sel = platform === pl;
                   return (
-                    <button
+                    <Box
+                      component="button"
                       key={pl}
                       onClick={() => setPlatform(pl)}
-                      className="h-7 px-3 rounded-full text-[11px] font-semibold border transition"
-                      style={{
+                      sx={{
+                        height: 28,
+                        px: 1.5,
+                        borderRadius: 999,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        border: "1px solid",
+                        cursor: "pointer",
+                        transition: "all 0.15s",
                         background: sel ? ACCENT : "white",
                         borderColor: sel ? ACCENT : "#e5e7eb",
                         color: sel ? "white" : "#374151",
                       }}
                     >
                       {pl}
-                    </button>
+                    </Box>
                   );
                 })}
-              </div>
+              </Stack>
               <AnimatePresence mode="wait">
-                <motion.div
+                <Box
+                  component={motion.div}
                   key={platform}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.2 }}
-                  className="rounded-xl border border-neutral-200 bg-neutral-50 p-3.5 text-[12px] text-neutral-700 leading-relaxed"
+                  sx={{
+                    borderRadius: 3,
+                    border: "1px solid",
+                    borderColor: "neutral.200",
+                    bgcolor: "neutral.50",
+                    p: 1.75,
+                    fontSize: 12,
+                    color: "neutral.700",
+                    lineHeight: 1.6,
+                  }}
                 >
                   {PLATFORM_INSTRUCTIONS[platform]}
-                </motion.div>
+                </Box>
               </AnimatePresence>
-            </div>
-          </motion.div>
+            </Box>
+          </Box>
         )}
-      </div>
-    </motion.div>
+      </Box>
+    </Box>
   );
 }
