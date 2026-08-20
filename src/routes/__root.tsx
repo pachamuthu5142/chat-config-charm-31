@@ -35,7 +35,7 @@ function CenteredMessage({ children }: { children: ReactNode }) {
 function NotFoundComponent() {
   return (
     <CenteredMessage>
-      <Typography variant="h2" fontWeight={700}>
+      <Typography variant="h2" sx={{ fontWeight: 700 }}>
         404
       </Typography>
       <Typography variant="h6" sx={{ mt: 1 }}>
@@ -64,7 +64,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
         Something went wrong on our end. You can try refreshing or head back home.
       </Typography>
-      <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 3 }}>
+      <Stack direction="row" spacing={1} sx={{ mt: 3, justifyContent: "center" }}>
         <Button
           variant="contained"
           onClick={() => {
